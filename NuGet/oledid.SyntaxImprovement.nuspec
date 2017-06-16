@@ -11,7 +11,7 @@
     <copyright>Copyright Ole Morten Didriksen 2017</copyright>
   </metadata>
   <files>
-    <file src="bin\Release\oledid.SyntaxImprovement.dll" target="lib\net462" />
-    <file src="bin\Release\oledid.SyntaxImprovement.pdb" target="lib\net462" />
+    <file src="..\src\SyntaxImprovement\bin\Release\oledid.SyntaxImprovement.dll" target="lib\net462" />
+    <file src="..\src\SyntaxImprovement\bin\Release\oledid.SyntaxImprovement.pdb" target="lib\net462" />
   </files>
 </package>

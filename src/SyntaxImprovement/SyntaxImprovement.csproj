@@ -72,8 +72,5 @@
     <Compile Include="Week.cs" />
     <Compile Include="Xml\XslTranslator.cs" />
   </ItemGroup>
-  <ItemGroup>
-    <None Include="SyntaxImprovement.nuspec" />
-  </ItemGroup>
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

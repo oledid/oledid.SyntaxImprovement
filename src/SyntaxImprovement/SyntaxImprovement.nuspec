@@ -1,0 +1,14 @@
+<?xml version="1.0"?>
+<package >
+  <metadata>
+    <id>oledid.SyntaxImprovement</id>
+    <version>$version$</version>
+    <title>$title$</title>
+    <authors>oledid</authors>
+    <licenseUrl>https://github.com/oledid-dotnet/SyntaxImprovementLibrary/blob/master/LICENSE</licenseUrl>
+    <projectUrl>https://github.com/oledid-dotnet/SyntaxImprovementLibrary</projectUrl>
+    <requireLicenseAcceptance>false</requireLicenseAcceptance>
+    <description>A collection of extension methods and helper functions to make a C# developer's life easier.</description>
+    <copyright>Copyright Ole Morten Didriksen 2017</copyright>
+  </metadata>
+</package>

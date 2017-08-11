@@ -52,6 +52,7 @@
     <Compile Include="Extensions\DayOfWeekExtensions.cs" />
     <Compile Include="Extensions\DictionaryExtensions.cs" />
     <Compile Include="Extensions\DirectoryInfoExtensions.cs" />
+    <Compile Include="Extensions\IEnumerableExtensions.cs" />
     <Compile Include="Xml\XmlFileReader.cs" />
     <Compile Include="Logging\TxtLogger.cs" />
     <Compile Include="Month.cs" />

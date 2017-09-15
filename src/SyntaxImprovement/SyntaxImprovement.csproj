@@ -4,6 +4,7 @@
     <TargetFramework>netstandard2.0</TargetFramework>
     <RootNamespace>oledid.SyntaxImprovement</RootNamespace>
     <AssemblyName>oledid.SyntaxImprovement</AssemblyName>
+    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
   </PropertyGroup>
 
 </Project>

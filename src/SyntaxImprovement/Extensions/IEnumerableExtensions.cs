@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 
 namespace oledid.SyntaxImprovement
 {
@@ -19,6 +20,20 @@ namespace oledid.SyntaxImprovement
 				hashSet.Add(value);
 				yield return element;
 			}
+		}
+
+		public static List<TSource> InsertAsFirstItem<TSource>(this IEnumerable<TSource> collection, TSource firstItem)
+		{
+			var list = new List<TSource> { firstItem };
+			list.AddRange(collection);
+			return list;
+		}
+
+		public static List<TSource> InsertAsLastItem<TSource>(this IEnumerable<TSource> collection, TSource lastItem)
+		{
+			var list = collection.ToList();
+			list.Add(lastItem);
+			return list;
 		}
 	}
 }

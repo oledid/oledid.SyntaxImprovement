@@ -4,7 +4,6 @@ namespace oledid.SyntaxImprovement.Tests.Extensions
 {
 	public class CharExtensionsTests
 	{
-		
 		public class IsNumber
 		{
 			[Fact]

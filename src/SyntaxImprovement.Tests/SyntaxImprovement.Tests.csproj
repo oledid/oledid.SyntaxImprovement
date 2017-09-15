@@ -4,12 +4,12 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{D86A8AA5-DF69-496F-869A-8EBD6B722A30}</ProjectGuid>
+    <ProjectGuid>{8601D061-BA25-4879-86DD-6F953A6CEB10}</ProjectGuid>
     <OutputType>Library</OutputType>
     <AppDesignerFolder>Properties</AppDesignerFolder>
     <RootNamespace>oledid.SyntaxImprovement.Tests</RootNamespace>
     <AssemblyName>oledid.SyntaxImprovement.Tests</AssemblyName>
-    <TargetFrameworkVersion>v4.6.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.7</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
@@ -32,6 +32,12 @@
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
+    <Reference Include="System.Xml.Linq" />
+    <Reference Include="System.Data.DataSetExtensions" />
+    <Reference Include="Microsoft.CSharp" />
+    <Reference Include="System.Data" />
+    <Reference Include="System.Net.Http" />
+    <Reference Include="System.Xml" />
     <Reference Include="xunit.abstractions, Version=2.0.0.0, Culture=neutral, PublicKeyToken=8d05b1bb7a6fdb6c, processorArchitecture=MSIL">
       <HintPath>..\..\packages\xunit.abstractions.2.0.1\lib\net35\xunit.abstractions.dll</HintPath>
     </Reference>
@@ -54,7 +60,7 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\SyntaxImprovement\SyntaxImprovement.csproj">
-      <Project>{6e1bfa57-959d-4412-bee4-f9f61f966021}</Project>
+      <Project>{86f5f27f-da45-4ad9-b2b6-3cfc83ff55bc}</Project>
       <Name>SyntaxImprovement</Name>
     </ProjectReference>
   </ItemGroup>

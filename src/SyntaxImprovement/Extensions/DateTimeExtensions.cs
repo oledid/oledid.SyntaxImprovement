@@ -96,5 +96,12 @@ namespace oledid.SyntaxImprovement
 				removeSeconds: removeSeconds,
 				removeMilliseconds: removeMilliseconds);
 		}
+
+		[Pure]
+		public static long ToUnixTimestamp(this DateTime date)
+		{
+			var epoch = new DateTime(1970, 1, 1, 0, 0, 0);
+			return (long)date.Subtract(epoch).TotalSeconds;
+		}
 	}
 }

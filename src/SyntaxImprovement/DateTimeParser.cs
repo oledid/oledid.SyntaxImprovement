@@ -29,5 +29,15 @@ namespace oledid.SyntaxImprovement
 
 			return result.Value;
 		}
+
+		public static DateTime FromUnixTimeStampToLocalTime(long unixTimeStamp)
+		{
+			return FromUnixTimeStampToUtcTime(unixTimeStamp).ToLocalTime();
+		}
+
+		public static DateTime FromUnixTimeStampToUtcTime(long unixTimeStamp)
+		{
+			return new DateTime(1970, 1, 1, 0, 0, 0, DateTimeKind.Utc).AddSeconds(unixTimeStamp);
+		}
 	}
 }

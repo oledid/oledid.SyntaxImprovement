@@ -54,6 +54,7 @@
     <Compile Include="DateTimeParserTests.cs" />
     <Compile Include="Extensions\CharExtensionsTests.cs" />
     <Compile Include="Extensions\DateTimeExtensionTests.cs" />
+    <Compile Include="Extensions\DayOfWeekExtensionsTests.cs" />
     <Compile Include="Extensions\IEnumerableExtensionsTests.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

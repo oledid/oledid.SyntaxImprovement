@@ -35,6 +35,52 @@ namespace oledid.SyntaxImprovement.Tests.Extensions
 				Assert.False('"'.IsNumber());
 				Assert.False('@'.IsNumber());
 			}
+
+			[Fact]
+			public void It_returns_true_if_the_char_is_a_letter_between_a_and_z()
+			{
+				Assert.True('A'.IsLetterAtoZ());
+				Assert.True('b'.IsLetterAtoZ());
+				Assert.True('C'.IsLetterAtoZ());
+				Assert.True('d'.IsLetterAtoZ());
+				Assert.True('E'.IsLetterAtoZ());
+				Assert.True('f'.IsLetterAtoZ());
+				Assert.True('G'.IsLetterAtoZ());
+				Assert.True('h'.IsLetterAtoZ());
+				Assert.True('I'.IsLetterAtoZ());
+				Assert.True('j'.IsLetterAtoZ());
+				Assert.True('K'.IsLetterAtoZ());
+				Assert.True('l'.IsLetterAtoZ());
+				Assert.True('M'.IsLetterAtoZ());
+				Assert.True('n'.IsLetterAtoZ());
+				Assert.True('O'.IsLetterAtoZ());
+				Assert.True('p'.IsLetterAtoZ());
+				Assert.True('Q'.IsLetterAtoZ());
+				Assert.True('r'.IsLetterAtoZ());
+				Assert.True('S'.IsLetterAtoZ());
+				Assert.True('t'.IsLetterAtoZ());
+				Assert.True('U'.IsLetterAtoZ());
+				Assert.True('v'.IsLetterAtoZ());
+				Assert.True('W'.IsLetterAtoZ());
+				Assert.True('x'.IsLetterAtoZ());
+				Assert.True('Y'.IsLetterAtoZ());
+				Assert.True('z'.IsLetterAtoZ());
+			}
+
+			[Fact]
+			public void It_returns_false_if_the_char_is_not_a_letter_between_a_and_z()
+			{
+				Assert.False('1'.IsLetterAtoZ());
+				Assert.False('5'.IsLetterAtoZ());
+				Assert.False('-'.IsLetterAtoZ());
+				Assert.False('æ'.IsLetterAtoZ());
+				Assert.False('ø'.IsLetterAtoZ());
+				Assert.False('å'.IsLetterAtoZ());
+				Assert.False('.'.IsLetterAtoZ());
+				Assert.False(','.IsLetterAtoZ());
+				Assert.False('"'.IsLetterAtoZ());
+				Assert.False('@'.IsLetterAtoZ());
+			}
 		}
 	}
 }

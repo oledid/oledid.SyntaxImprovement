@@ -44,5 +44,34 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
 			}
 		}
+
+		public class UpdateTests
+		{
+			[Fact]
+			public void It_generates_correct_insert()
+			{
+				var query = new Update<Person>()
+					.Set(person => person.Name, "Peter")
+					.Where(person => person.Id == 1)
+					.ToQuery();
+				Assert.Equal("UPDATE [Person] SET [Name] = @p1 WHERE [Id] = @p0", query.QueryText);
+				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+			}
+
+			[Fact]
+			public void It_generates_correct_insert_with_multi_params()
+			{
+				var query = new Update<Person>()
+					.Set(person => person.Name, "Peter")
+					.Set(person => person.Id, 2)
+					.Where(person => person.Id == 1)
+					.ToQuery();
+				Assert.Equal("UPDATE [Person] SET [Name] = @p1, [Id] = @p2 WHERE [Id] = @p0", query.QueryText);
+				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+				Assert.Equal(2, ((IDictionary<string, object>)((dynamic)query).Parameters)["p2"]);
+				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+			}
+		}
 	}
 }

@@ -6,8 +6,11 @@ namespace oledid.SyntaxImprovement.Generators.Sql
 {
 	public class Update<TableType> : UpdateBase<TableType> where TableType : DatabaseTable, new()
 	{
-		internal Update(UpdateManager<TableType> manager)
-			: base(manager)
+		public Update() : base(new UpdateManager<TableType>())
+		{
+		}
+
+		internal Update(UpdateManager<TableType> manager) : base(manager)
 		{
 		}
 

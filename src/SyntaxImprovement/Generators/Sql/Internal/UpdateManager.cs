@@ -55,8 +55,9 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			var expressions = new List<string>();
 			foreach (var setExpression in setExpressions)
 			{
-				expressions.Add(setExpression.GetColumnName() + " = " + parameterFactory.Create(setExpression.Value) + " ");
+				expressions.Add(setExpression.GetColumnName() + " = " + parameterFactory.Create(setExpression.Value));
 			}
+
 			return string.Join(", ", expressions);
 		}
 	}

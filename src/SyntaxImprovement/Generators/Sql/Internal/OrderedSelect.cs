@@ -12,7 +12,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		public OrderedSelect<TableType> ThenBy(Expression<Func<TableType, object>> expression, bool descending = false)
 		{
 			var ascending = !descending;
-			Manager.AddOrderByExpression(expression, ascending);
+			Manager.ThenByExpression(expression, ascending);
 			return new OrderedSelect<TableType>(Manager);
 		}
 	}

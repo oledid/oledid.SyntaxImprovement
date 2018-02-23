@@ -42,14 +42,29 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			else
 			{
 				var value = GetValueFromConstant(node);
-				if (value.GetType().IsValueType == false && value is string == false && node.NodeType == ExpressionType.MemberAccess)
+				if (value.GetType().IsValueType == false && value is string == false && node.NodeType == ExpressionType.MemberAccess && value is ICollection == false)
 				{
 					throw new NotImplementedException();
 				}
+
 				valueStack.Push(value);
 				TryFinishStatement();
 			}
 			return base.VisitMember(node);
+		}
+
+		protected override Expression VisitMethodCall(MethodCallExpression node)
+		{
+			if (node.Method.Name == "Contains")
+			{
+				operatorStack.Push(ExpressionType.Equal);
+			}
+			else
+			{
+				throw new NotSupportedException("Unknown method " + node.Method.Name);
+			}
+
+			return base.VisitMethodCall(node);
 		}
 
 		protected override Expression VisitConstant(ConstantExpression node)

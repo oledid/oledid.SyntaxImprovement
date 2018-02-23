@@ -48,13 +48,13 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 				+ orderByQueryPart + ";";
 		}
 
-		public void SetOrderByExpression(Expression<Func<TableType, object>> expression, bool ascending)
+		public void OrderByExpression(Expression<Func<TableType, object>> expression, bool ascending)
 		{
 			orderByStatements.Clear();
-			AddOrderByExpression(expression, ascending);
+			ThenByExpression(expression, ascending);
 		}
 
-		public void AddOrderByExpression(Expression<Func<TableType, object>> expression, bool ascending)
+		public void ThenByExpression(Expression<Func<TableType, object>> expression, bool ascending)
 		{
 			orderByStatements.Add(Tuple.Create(expression, ascending));
 		}

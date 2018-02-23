@@ -27,7 +27,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql
 		public OrderedSelect<TableType> OrderBy(Expression<Func<TableType, object>> expression, bool descending = false)
 		{
 			var ascending = !descending;
-			Manager.SetOrderByExpression(expression, ascending);
+			Manager.OrderByExpression(expression, ascending);
 			return new OrderedSelect<TableType>(Manager);
 		}
 	}

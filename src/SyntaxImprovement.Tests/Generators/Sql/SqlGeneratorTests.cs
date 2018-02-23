@@ -77,6 +77,23 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 
 				Assert.Equal("SELECT [Id], [Name] FROM [Person] ORDER BY [Id] desc, [Name];", query.QueryText);
 			}
+
+			[Fact]
+			public void It_can_do_both_where_and_order_by()
+			{
+				var list = new List<int> {1, 3, 5};
+
+				var query = new Select<Person>()
+					.Where(person => list.Contains(person.Id))
+					.OrderBy(person => person.Id, descending: true)
+					.ThenBy(person => person.Name)
+					.ToQuery();
+
+				Assert.Equal("SELECT [Id], [Name] FROM [Person] WHERE [Id] IN (@p0, @p1, @p2) ORDER BY [Id] desc, [Name];", query.QueryText);
+				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+				Assert.Equal(3, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+				Assert.Equal(5, ((IDictionary<string, object>)((dynamic)query).Parameters)["p2"]);
+			}
 		}
 
 		public class UpdateTests

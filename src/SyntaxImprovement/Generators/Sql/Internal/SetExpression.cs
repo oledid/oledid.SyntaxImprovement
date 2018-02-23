@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Linq.Expressions;
-using oledid.SyntaxImprovement.Generators.Sql.Internal;
 
-namespace oledid.SyntaxImprovement.Generators.Sql
+namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 {
-	public class SetExpression<TableType> where TableType : DatabaseTable, new()
+	internal class SetExpression<TableType> where TableType : DatabaseTable, new()
 	{
 		internal SetExpression()
 		{

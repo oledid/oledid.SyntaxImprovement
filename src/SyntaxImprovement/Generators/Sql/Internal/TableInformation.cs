@@ -3,9 +3,9 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 
-namespace oledid.SyntaxImprovement.Generators.Sql
+namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 {
-	public class TableInformation<TableType> where TableType : DatabaseTable, new()
+	internal class TableInformation<TableType> where TableType : DatabaseTable, new()
 	{
 		private string tableName;
 		private string schemaName;

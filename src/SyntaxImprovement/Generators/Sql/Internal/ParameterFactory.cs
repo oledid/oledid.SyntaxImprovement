@@ -3,9 +3,9 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
 
-namespace oledid.SyntaxImprovement.Generators.Sql
+namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 {
-	public class ParameterFactory
+	internal class ParameterFactory
 	{
 		private int currentParameterIterator;
 		private readonly List<Parameter> parameters;

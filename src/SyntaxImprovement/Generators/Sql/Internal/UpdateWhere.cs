@@ -1,6 +1,4 @@
-﻿using oledid.SyntaxImprovement.Generators.Sql.Internal;
-
-namespace oledid.SyntaxImprovement.Generators.Sql
+﻿namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 {
 	public class UpdateWhere<TableType> : UpdateBase<TableType> where TableType : DatabaseTable, new()
 	{

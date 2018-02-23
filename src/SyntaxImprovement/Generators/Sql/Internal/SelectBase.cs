@@ -1,6 +1,4 @@
-﻿using oledid.SyntaxImprovement.Generators.Sql.Internal;
-
-namespace oledid.SyntaxImprovement.Generators.Sql
+﻿namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 {
 	public abstract class SelectBase<TableType> where TableType : DatabaseTable, new()
 	{

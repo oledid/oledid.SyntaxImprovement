@@ -58,9 +58,11 @@
     <Compile Include="Extensions\DayOfWeekExtensionsTests.cs" />
     <Compile Include="Extensions\DecimalExtensionsTests.cs" />
     <Compile Include="Extensions\IEnumerableExtensionsTests.cs" />
+    <Compile Include="Generators\Sql\IsComputedTests.cs" />
     <Compile Include="Generators\Sql\SqlGeneratorTests.cs" />
     <Compile Include="Generators\Sql\SqlQueryTests.cs" />
     <Compile Include="Generators\Sql\TestModels\DataTypesModel.cs" />
+    <Compile Include="Generators\Sql\TestModels\ModelWithComputedField.cs" />
     <Compile Include="Generators\Sql\TestModels\Person.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>

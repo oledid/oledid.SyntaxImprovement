@@ -30,9 +30,9 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			return schemaValue + "[" + tableName + "]";
 		}
 
-		public List<string> GetColumnNames(bool excludeIdentityColumns = false)
+		public List<string> GetColumnNames(bool excludeIdentityColumns = false, bool excludeComputedFields = false)
 		{
-			var columns = GetColumns(excludeIdentityColumns);
+			var columns = GetColumns(excludeIdentityColumns, excludeComputedFields);
 
 			var result = new List<string>();
 			foreach (var column in columns)
@@ -59,28 +59,26 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			return column;
 		}
 
-		public List<object> GetColumnValues(DatabaseTable instance, bool excludeIdentityColumns = false)
+		public List<object> GetColumnValues(DatabaseTable instance, bool excludeIdentityColumns = false, bool excludeComputedFields = false)
 		{
-			var columns = GetColumns(excludeIdentityColumns);
+			var columns = GetColumns(excludeIdentityColumns, excludeComputedFields);
 
 			var result = new List<object>();
 			foreach (var column in columns)
 			{
-				var value = column.GetValue(instance);
-				if (value == null)
-				{
-					value = DBNull.Value;
-				}
+				var value = column.GetValue(instance) ?? DBNull.Value;
 				result.Add(value);
 			}
 
 			return result;
 		}
 
-		public IEnumerable<PropertyInfo> GetColumns(bool excludeIdentityColumns = false)
+		public IEnumerable<PropertyInfo> GetColumns(bool excludeIdentityColumns = false, bool excludeComputedFields = false)
 		{
 			return typeof(TableType).GetProperties(BindingFlags.Public | BindingFlags.Instance)
-				.Where(column => excludeIdentityColumns == false || Attribute.IsDefined(column, typeof(IsIdentityAttribute)) == false)
+				.Where(column =>
+					(excludeIdentityColumns == false || Attribute.IsDefined(column, typeof(IsIdentityAttribute)) == false)
+					&& (excludeComputedFields == false || Attribute.IsDefined(column, typeof(IsComputedAttribute)) == false))
 				.ToList();
 		}
 

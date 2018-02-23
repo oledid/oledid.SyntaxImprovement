@@ -3,6 +3,10 @@ using oledid.SyntaxImprovement.Generators.Sql.Internal;
 
 namespace oledid.SyntaxImprovement.Generators.Sql
 {
+	/// <summary>
+	/// Used to generate a sql INSERT-query
+	/// </summary>
+	/// <typeparam name="TableType">A class which inherits from <see cref="DatabaseTable"/></typeparam>
 	public class Insert<TableType> where TableType : DatabaseTable, new()
 	{
 		private readonly List<TableType> instances;

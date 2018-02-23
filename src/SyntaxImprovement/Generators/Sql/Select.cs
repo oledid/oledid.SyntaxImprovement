@@ -4,6 +4,10 @@ using oledid.SyntaxImprovement.Generators.Sql.Internal;
 
 namespace oledid.SyntaxImprovement.Generators.Sql
 {
+	/// <summary>
+	/// Used to generate a sql SELECT-query
+	/// </summary>
+	/// <typeparam name="TableType">A class which inherits from <see cref="DatabaseTable"/></typeparam>
 	public class Select<TableType> : SelectBase<TableType> where TableType : DatabaseTable, new()
 	{
 		public Select() : base(new SelectManager<TableType>())

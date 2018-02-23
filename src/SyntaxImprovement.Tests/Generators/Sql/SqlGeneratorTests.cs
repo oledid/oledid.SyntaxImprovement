@@ -136,6 +136,41 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 				Assert.Equal(2, ((IDictionary<string, object>)((dynamic)query).Parameters)["p2"]);
 				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
 			}
+
+			[Fact]
+			public void It_can_update_boolean_fields()
+			{
+				var userId = Guid.NewGuid();
+				var personId = Guid.NewGuid();
+
+				var user = new User
+				{
+					Id = userId,
+					CanWrite = true,
+					ExternalId = "123",
+					ExternalIdType = "fds",
+					ExternalName = "fds",
+					IsActive = true,
+					IsAdmin = true,
+					LastLogin = DateTime.Now,
+					PersonId = personId
+				};
+
+				var query = new Update<User>()
+					.Set(u => u.PersonId, user.PersonId)
+					.Set(u => u.IsActive, user.IsActive)
+					.Set(u => u.IsAdmin, user.IsAdmin)
+					.Set(u => u.CanWrite, user.CanWrite)
+					.Where(u => u.Id == user.Id)
+					.ToQuery();
+
+				Assert.Equal("UPDATE [familytree].[User] SET [PersonId] = @p1, [IsActive] = @p2, [IsAdmin] = @p3, [CanWrite] = @p4 WHERE [Id] = @p0", query.QueryText);
+				Assert.Equal(userId, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+				Assert.Equal(personId, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["p2"]);
+				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["p3"]);
+				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["p4"]);
+			}
 		}
 
 		public class InsertTests

@@ -64,6 +64,7 @@
     <Compile Include="Generators\Sql\TestModels\DataTypesModel.cs" />
     <Compile Include="Generators\Sql\TestModels\ModelWithComputedField.cs" />
     <Compile Include="Generators\Sql\TestModels\Person.cs" />
+    <Compile Include="Generators\Sql\TestModels\User.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>

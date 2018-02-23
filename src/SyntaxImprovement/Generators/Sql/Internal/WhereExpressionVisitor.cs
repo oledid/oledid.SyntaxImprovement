@@ -33,6 +33,20 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 
 		protected override Expression VisitMember(MemberExpression node)
 		{
+			try
+			{
+				var value = GetValueFromConstant(node);
+				if (value != null)
+				{
+					valueStack.Push(value);
+					TryFinishStatement();
+				}
+			}
+			catch
+			{
+				//
+			}
+
 			if (node.Expression != null && node.Expression.Type == typeof(TableType))
 			{
 				memberStack.Push(node.Member);
@@ -44,12 +58,13 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 				var value = GetValueFromConstant(node);
 				if (value.GetType().IsValueType == false && value is string == false && node.NodeType == ExpressionType.MemberAccess && value is ICollection == false)
 				{
-					throw new NotImplementedException();
+					// throw new NotImplementedException();
 				}
 
 				valueStack.Push(value);
 				TryFinishStatement();
 			}
+
 			return base.VisitMember(node);
 		}
 
@@ -65,6 +80,13 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			}
 
 			return base.VisitMethodCall(node);
+		}
+
+		protected override MemberMemberBinding VisitMemberMemberBinding(MemberMemberBinding node)
+		{
+			node.ToString();
+
+			return base.VisitMemberMemberBinding(node);
 		}
 
 		protected override Expression VisitConstant(ConstantExpression node)

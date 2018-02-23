@@ -7,5 +7,10 @@ namespace oledid.SyntaxImprovement.Generators.Sql
 		internal DeleteWhere(DeleteManager<TableType> manager) : base(manager)
 		{
 		}
+
+		public SqlQuery ToQuery()
+		{
+			return manager.ToQuery();
+		}
 	}
 }

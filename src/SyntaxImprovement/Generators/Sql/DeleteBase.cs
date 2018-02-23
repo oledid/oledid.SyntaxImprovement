@@ -10,10 +10,5 @@ namespace oledid.SyntaxImprovement.Generators.Sql
 		{
 			this.manager = manager;
 		}
-
-		public SqlQuery ToQuery()
-		{
-			return manager.ToQuery();
-		}
 	}
 }

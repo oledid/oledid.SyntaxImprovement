@@ -154,5 +154,25 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 				Assert.Equal(new Guid("67a76215-bc11-41cb-838f-c43fe81efcae"), ((IDictionary<string, object>)((dynamic)query).Parameters)["p4"]);
 			}
 		}
+
+		public class DeleteTests
+		{
+			[Fact]
+			public void It_generates_correct_query()
+			{
+				var query = new Delete<Person>().Where(person => person.Name == "Peter" || person.Id == 1).ToQuery();
+				Assert.Equal("DELETE FROM [Person] WHERE ([Name] = @p0) OR ([Id] = @p1);", query.QueryText);
+				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+			}
+
+			// todo:
+			//[Fact]
+			//public void It_generates_correct_parantheses()
+			//{
+			//	var query = new Delete<Person>().Where(person => (person.Name == "Peter" || person.Name == "Pete") && person.Id == 1).ToQuery();
+			//	Assert.Equal("DELETE FROM [Person] WHERE (([Name] = @p0 OR [Name] = @p1)) AND ([Id] = @p2);", query.QueryText);
+			//}
+		}
 	}
 }

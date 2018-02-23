@@ -6,6 +6,10 @@ namespace oledid.SyntaxImprovement.Generators.Sql
 {
 	public class Delete<TableType> : DeleteBase<TableType> where TableType : DatabaseTable, new()
 	{
+		public Delete() : base(new DeleteManager<TableType>())
+		{
+		}
+
 		internal Delete(DeleteManager<TableType> manager) : base(manager)
 		{
 		}

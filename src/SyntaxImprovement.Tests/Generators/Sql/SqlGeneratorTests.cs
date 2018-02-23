@@ -94,6 +94,17 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 				Assert.Equal(3, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
 				Assert.Equal(5, ((IDictionary<string, object>)((dynamic)query).Parameters)["p2"]);
 			}
+
+			[Fact]
+			public void It_can_do_like_queries()
+			{
+				var query = new Select<Person>()
+					.Where(person => person.Name.Contains("Pete"))
+					.ToQuery();
+
+				Assert.Equal("SELECT [Id], [Name] FROM [Person] WHERE [Name] LIKE @p0;", query.QueryText);
+				Assert.Equal("%Pete%", ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+			}
 		}
 
 		public class UpdateTests
@@ -213,14 +224,6 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
 				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
 			}
-
-			// todo:
-			//[Fact]
-			//public void It_generates_correct_parantheses()
-			//{
-			//	var query = new Delete<Person>().Where(person => (person.Name == "Peter" || person.Name == "Pete") && person.Id == 1).ToQuery();
-			//	Assert.Equal("DELETE FROM [Person] WHERE (([Name] = @p0 OR [Name] = @p1)) AND ([Id] = @p2);", query.QueryText);
-			//}
 		}
 	}
 }

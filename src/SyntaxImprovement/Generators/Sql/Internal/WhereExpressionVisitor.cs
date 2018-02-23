@@ -57,7 +57,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		{
 			if (node.Method.Name == "Contains")
 			{
-				operatorStack.Push(ExpressionType.Equal);
+				operatorStack.Push(ExpressionType.Modulo);
 			}
 			else
 			{
@@ -132,7 +132,9 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		{
 			var columnExpression = "[" + member.Name + "]";
 			var operatorExpression = GetOperatorExpression(@operator, isCollection: value is ICollection);
-			var valueExpression = parameterFactory.Create(value);
+			var valueExpression = operatorExpression == " LIKE "
+				? parameterFactory.Create("%" + value + "%")
+				: parameterFactory.Create(value);
 			var whereStatement = columnExpression + operatorExpression + valueExpression;
 			if (hasMoreOperators)
 			{
@@ -161,13 +163,9 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			switch (@operator)
 			{
 				case ExpressionType.Equal:
-					return isCollection
-					? " IN "
-					: " = ";
+					return " = ";
 				case ExpressionType.NotEqual:
-					return isCollection
-					? " IN "
-					: " != ";
+					return " != ";
 				case ExpressionType.LessThan:
 					return " < ";
 				case ExpressionType.LessThanOrEqual:
@@ -180,6 +178,10 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 					return " AND ";
 				case ExpressionType.OrElse:
 					return " OR ";
+				case ExpressionType.Modulo:
+					return isCollection
+						? " IN "
+						: " LIKE ";
 				default:
 					throw new NotSupportedException();
 			}

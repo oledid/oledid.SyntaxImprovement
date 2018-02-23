@@ -3,7 +3,7 @@ using System.Linq.Expressions;
 
 namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 {
-	internal static class WhereQueryGenerator
+	internal static class WhereGenerator
 	{
 		public static string CreateQuery<TableType>(ParameterFactory parameterFactory, Expression<Func<TableType, bool>> expression) where TableType : DatabaseTable, new()
 		{

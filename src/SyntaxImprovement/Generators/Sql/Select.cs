@@ -23,5 +23,12 @@ namespace oledid.SyntaxImprovement.Generators.Sql
 			Manager.SetWhereExpression(expression);
 			return new SelectWhere<TableType>(Manager);
 		}
+
+		public OrderedSelect<TableType> OrderBy(Expression<Func<TableType, object>> expression, bool descending = false)
+		{
+			var ascending = !descending;
+			Manager.SetOrderByExpression(expression, ascending);
+			return new OrderedSelect<TableType>(Manager);
+		}
 	}
 }

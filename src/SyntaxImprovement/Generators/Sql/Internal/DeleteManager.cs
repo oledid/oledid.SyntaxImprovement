@@ -30,7 +30,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		private string CreateQuery(ParameterFactory parameterFactory)
 		{
 			var tableName = tableInformation.GetSchemaAndTableName();
-			var whereQueryPart = WhereQueryGenerator.CreateQuery(parameterFactory, whereStatement);
+			var whereQueryPart = WhereGenerator.CreateQuery(parameterFactory, whereStatement);
 			return
 				"DELETE FROM " + tableName
 			  + whereQueryPart + ";";

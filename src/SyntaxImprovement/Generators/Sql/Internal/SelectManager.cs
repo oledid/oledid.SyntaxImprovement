@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Linq.Expressions;
 
 namespace oledid.SyntaxImprovement.Generators.Sql.Internal
@@ -7,10 +8,12 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 	{
 		private readonly TableInformation<TableType> tableInformation;
 		private Expression<Func<TableType, bool>> whereStatement;
+		private readonly List<Tuple<Expression<Func<TableType, object>>, bool>> orderByStatements;
 
 		public SelectManager()
 		{
 			tableInformation = new TableInformation<TableType>();
+			orderByStatements = new List<Tuple<Expression<Func<TableType, object>>, bool>>();
 		}
 
 		public Select<TableType> Select()
@@ -36,11 +39,24 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		{
 			var tableName = tableInformation.GetSchemaAndTableName();
 			var columns = tableInformation.GetColumnNames();
-			var whereQueryPart = WhereQueryGenerator.CreateQuery(parameterFactory, whereStatement);
+			var whereQueryPart = WhereGenerator.CreateQuery(parameterFactory, whereStatement);
+			var orderByQueryPart = OrderByGenerator.CreateQuery(orderByStatements);
 			return
 				  "SELECT " + string.Join(", ", columns)
 				+ " FROM " + tableName
-				+ whereQueryPart + ";";
+				+ whereQueryPart
+				+ orderByQueryPart + ";";
+		}
+
+		public void SetOrderByExpression(Expression<Func<TableType, object>> expression, bool ascending)
+		{
+			orderByStatements.Clear();
+			AddOrderByExpression(expression, ascending);
+		}
+
+		public void AddOrderByExpression(Expression<Func<TableType, object>> expression, bool ascending)
+		{
+			orderByStatements.Add(Tuple.Create(expression, ascending));
 		}
 	}
 }

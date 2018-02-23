@@ -46,6 +46,37 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
 				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
 			}
+
+			[Fact]
+			public void It_can_order_by_asc()
+			{
+				var query = new Select<Person>()
+					.OrderBy(person => person.Id)
+					.ToQuery();
+
+				Assert.Equal("SELECT [Id], [Name] FROM [Person] ORDER BY [Id];", query.QueryText);
+			}
+
+			[Fact]
+			public void It_can_order_by_desc()
+			{
+				var query = new Select<Person>()
+					.OrderBy(person => person.Id, descending: true)
+					.ToQuery();
+
+				Assert.Equal("SELECT [Id], [Name] FROM [Person] ORDER BY [Id] desc;", query.QueryText);
+			}
+
+			[Fact]
+			public void It_can_order_by_multi()
+			{
+				var query = new Select<Person>()
+					.OrderBy(person => person.Id, descending: true)
+					.ThenBy(person => person.Name)
+					.ToQuery();
+
+				Assert.Equal("SELECT [Id], [Name] FROM [Person] ORDER BY [Id] desc, [Name];", query.QueryText);
+			}
 		}
 
 		public class UpdateTests

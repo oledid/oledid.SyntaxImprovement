@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Diagnostics.Contracts;
 
 namespace oledid.SyntaxImprovement
@@ -17,9 +17,7 @@ namespace oledid.SyntaxImprovement
 		[Pure]
 		public static TimeSpan? RemoveTimeParts(this TimeSpan? value, bool removeDays = false, bool removeHours = false, bool removeMinutes = false, bool removeSeconds = false, bool removeMilliseconds = false)
 		{
-			return value.HasValue
-				? (TimeSpan?)value.Value.RemoveTimeParts(removeDays, removeHours, removeMinutes, removeSeconds, removeMilliseconds)
-				: null;
+			return value?.RemoveTimeParts(removeDays, removeHours, removeMinutes, removeSeconds, removeMilliseconds);
 		}
 
 		/// <summary>

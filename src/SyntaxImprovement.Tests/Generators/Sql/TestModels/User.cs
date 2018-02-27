@@ -24,7 +24,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql.TestModels
 
 		public override string GetSchemaName()
 		{
-			return "familytree";
+			return "userschema";
 		}
 	}
 }

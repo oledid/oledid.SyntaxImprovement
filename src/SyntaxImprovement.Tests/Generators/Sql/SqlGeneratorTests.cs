@@ -151,7 +151,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 					ExternalIdType = "fds",
 					ExternalName = "fds",
 					IsActive = true,
-					IsAdmin = true,
+					IsAdmin = false,
 					LastLogin = DateTime.Now,
 					PersonId = personId
 				};
@@ -164,11 +164,11 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 					.Where(u => u.Id == user.Id)
 					.ToQuery();
 
-				Assert.Equal("UPDATE [familytree].[User] SET [PersonId] = @p1, [IsActive] = @p2, [IsAdmin] = @p3, [CanWrite] = @p4 WHERE [Id] = @p0", query.QueryText);
+				Assert.Equal("UPDATE [userschema].[User] SET [PersonId] = @p1, [IsActive] = @p2, [IsAdmin] = @p3, [CanWrite] = @p4 WHERE [Id] = @p0", query.QueryText);
 				Assert.Equal(userId, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
 				Assert.Equal(personId, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
 				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["p2"]);
-				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["p3"]);
+				Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["p3"]);
 				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["p4"]);
 			}
 		}

@@ -27,14 +27,38 @@ namespace oledid.SyntaxImprovement.Xml
 				dataSet.WriteXml(dataSetXmlWriter);
 				dataSetOutputStream.Position = 0;
 
+				var stringBuilder = new StringBuilder();
+
+				var outputSettings = CreateOutputSettings(xslTransform.OutputSettings);
+
 				using (var dataSetXml = new XmlTextReader(dataSetOutputStream))
-				using (var resultOutputStream = new MemoryStream())
-				using (var resultWriter = new XmlTextWriter(resultOutputStream, encoding))
+				using (var resultWriter = XmlWriter.Create(stringBuilder, outputSettings))
 				{
 					xslTransform.Transform(dataSetXml, resultWriter);
-					return encoding.GetString(resultOutputStream.ToArray());
+					return stringBuilder.ToString();
 				}
 			}
+		}
+
+		private static XmlWriterSettings CreateOutputSettings(XmlWriterSettings settingsFromReader)
+		{
+			return new XmlWriterSettings
+			{
+				Async = settingsFromReader.Async,
+				CheckCharacters = settingsFromReader.CheckCharacters,
+				CloseOutput = settingsFromReader.CloseOutput,
+				ConformanceLevel = settingsFromReader.ConformanceLevel,
+				DoNotEscapeUriAttributes = settingsFromReader.DoNotEscapeUriAttributes,
+				Encoding = settingsFromReader.Encoding,
+				Indent = settingsFromReader.Indent,
+				IndentChars = settingsFromReader.IndentChars,
+				NamespaceHandling = settingsFromReader.NamespaceHandling,
+				NewLineChars = settingsFromReader.NewLineChars,
+				NewLineHandling = settingsFromReader.NewLineHandling,
+				NewLineOnAttributes = settingsFromReader.NewLineOnAttributes,
+				OmitXmlDeclaration = settingsFromReader.OutputMethod == XmlOutputMethod.AutoDetect || settingsFromReader.OmitXmlDeclaration,
+				WriteEndDocumentOnClose = settingsFromReader.WriteEndDocumentOnClose
+			};
 		}
 	}
 }

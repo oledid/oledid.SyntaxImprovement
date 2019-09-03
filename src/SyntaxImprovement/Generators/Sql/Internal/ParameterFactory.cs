@@ -24,7 +24,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			var parameter = new Parameter
 			{
 				Name = "@p" + currentParameterIterator++,
-				Value = (value as DBNull) ?? value
+				Value = value
 			};
 			parameters.Add(parameter);
 			return parameter.Name;

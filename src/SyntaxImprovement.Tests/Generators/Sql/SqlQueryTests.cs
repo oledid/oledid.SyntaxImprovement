@@ -18,7 +18,9 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 				Long = int.MaxValue + 1L,
 				Decimal = 0.42m,
 				DateTime = new DateTime(2018, 2, 23, 13, 37, 0),
-				Guid = new Guid("67a76215-bc11-41cb-838f-c43fe81efcae")
+				Guid = new Guid("67a76215-bc11-41cb-838f-c43fe81efcae"),
+				StringWithValue = "abc123",
+				NullString = null
 			};
 			var query = new Insert<DataTypesModel>().Add(model).ToQuery();
 
@@ -29,7 +31,9 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 			Assert.Equal(new KeyValuePair<string, object>("p2", 0.42m), list[2]);
 			Assert.Equal(new KeyValuePair<string, object>("p3", new DateTime(2018, 2, 23, 13, 37, 0)), list[3]);
 			Assert.Equal(new KeyValuePair<string, object>("p4", new Guid("67a76215-bc11-41cb-838f-c43fe81efcae")), list[4]);
-			Assert.Equal(5, list.Count);
+			Assert.Equal(new KeyValuePair<string, object>("p5", "abc123"), list[5]);
+			Assert.Equal(new KeyValuePair<string, object>("p6", null), list[6]);
+			Assert.Equal(7, list.Count);
 		}
 	}
 }

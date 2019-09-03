@@ -20,5 +20,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql.TestModels
 		public decimal Decimal { get; set; }
 		public DateTime DateTime { get; set; }
 		public Guid Guid { get; set; }
+		public string StringWithValue { get; set; }
+		public string NullString { get; set; }
 	}
 }

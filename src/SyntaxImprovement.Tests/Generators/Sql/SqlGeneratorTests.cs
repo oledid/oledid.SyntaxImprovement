@@ -236,16 +236,20 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 					Long = int.MaxValue + 1L,
 					Decimal = 0.42m,
 					DateTime = new DateTime(2018, 2, 23, 13, 37, 0),
-					Guid = new Guid("67a76215-bc11-41cb-838f-c43fe81efcae")
+					Guid = new Guid("67a76215-bc11-41cb-838f-c43fe81efcae"),
+					StringWithValue = "abc123",
+					NullString = null
 				};
 				var query = new Insert<DataTypesModel>().Add(model).ToQuery();
 
-				Assert.Equal("INSERT INTO [TestSchema].[DataTypesModel] ([Boolean], [Long], [Decimal], [DateTime], [Guid]) SELECT @p0, @p1, @p2, @p3, @p4;", query.QueryText.Trim());
+				Assert.Equal("INSERT INTO [TestSchema].[DataTypesModel] ([Boolean], [Long], [Decimal], [DateTime], [Guid], [StringWithValue], [NullString]) SELECT @p0, @p1, @p2, @p3, @p4, @p5, @p6;", query.QueryText.Trim());
 				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
 				Assert.Equal(int.MaxValue + 1L, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
 				Assert.Equal(0.42m, ((IDictionary<string, object>)((dynamic)query).Parameters)["p2"]);
 				Assert.Equal(new DateTime(2018, 2, 23, 13, 37, 0), ((IDictionary<string, object>)((dynamic)query).Parameters)["p3"]);
 				Assert.Equal(new Guid("67a76215-bc11-41cb-838f-c43fe81efcae"), ((IDictionary<string, object>)((dynamic)query).Parameters)["p4"]);
+				Assert.Equal("abc123", ((IDictionary<string, object>)((dynamic)query).Parameters)["p5"]);
+				Assert.Null(((IDictionary<string, object>)((dynamic)query).Parameters)["p6"]);
 			}
 		}
 

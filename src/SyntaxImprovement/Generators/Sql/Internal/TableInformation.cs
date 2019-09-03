@@ -66,7 +66,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			var result = new List<object>();
 			foreach (var column in columns)
 			{
-				var value = column.GetValue(instance) ?? DBNull.Value;
+				var value = column.GetValue(instance);
 				result.Add(value);
 			}
 

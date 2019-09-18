@@ -56,6 +56,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithms\CaesarCipherTests.cs" />
+    <Compile Include="Attributes\LookupAttributeTests.cs" />
     <Compile Include="DateTimeParserTests.cs" />
     <Compile Include="Extensions\CharExtensionsTests.cs" />
     <Compile Include="Extensions\DateTimeExtensionTests.cs" />

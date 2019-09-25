@@ -34,5 +34,4 @@ jobs:
       
 
     - name: Diagnostics
-      run: dir /s
-      run: type version.txt
+      run: dir /s && type version.txt

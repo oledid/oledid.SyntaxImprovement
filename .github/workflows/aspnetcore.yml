@@ -27,7 +27,7 @@ jobs:
         dotnet-version: 2.2.108
     
     - name: Install NuGet client
-      run: wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+      run: sudo apt-get install nuget && wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
 
     - name: Build with dotnet
       run: dotnet build --configuration Release
@@ -36,7 +36,7 @@ jobs:
       run: dotnet test
 
     - name: Add NuGet source
-      run: nuget source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/oledid/index.json" -UserName oledid -Password ${{ secrets.GITHUB_TOKEN }}
+      run: mono nuget.exe source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/oledid/index.json" -UserName oledid -Password ${{ secrets.GITHUB_TOKEN }}
 
     - name: NuGet pack
       run: pwsh ./NuGet/pack.ps1

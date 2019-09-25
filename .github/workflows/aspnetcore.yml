@@ -27,7 +27,7 @@ jobs:
         dotnet-version: 2.2.108
     
     - name: Install NuGet client
-      uses: warrenbuckley/Setup-Nuget@v1
+      run: wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
 
     - name: Build with dotnet
       run: dotnet build --configuration Release
@@ -42,5 +42,5 @@ jobs:
       run: pwsh ./NuGet/pack.ps1
       
     - name: Push to GitHub packages
-      run: nuget push "oledid.SyntaxImprovement.*.nupkg" -Verbosity Detailed -Source "GitHub"
+      run: mono nuget.exe push "oledid.SyntaxImprovement.*.nupkg" -Source "GitHub"
 

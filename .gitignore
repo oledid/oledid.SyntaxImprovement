@@ -5,6 +5,9 @@
 
 docs
 
+*.compiled.nuspec
+version.txt
+
 oledid.SyntaxImprovement.xml
 
 # User-specific files

@@ -18,6 +18,9 @@ jobs:
     - name: Echo Git version
       run: cat version.txt
 
+    - name: Patch AssemblyInfos
+      run: pwsh update-assemblyversion.ps1
+
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:

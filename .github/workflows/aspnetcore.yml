@@ -36,7 +36,7 @@ jobs:
       run: dotnet test
 
     - name: Add NuGet source
-      run: mono nuget.exe source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/oledid/index.json" -UserName oledid -Password ${{ secrets.GITHUB_TOKEN }}
+      run: mono nuget.exe source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/oledid/oledid.SyntaxImprovement/index.json" -UserName oledid -Password ${{ secrets.GITHUB_TOKEN }}
 
     - name: NuGet pack
       run: pwsh ./NuGet/pack.ps1

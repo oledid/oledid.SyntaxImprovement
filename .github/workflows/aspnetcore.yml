@@ -34,11 +34,11 @@ jobs:
       run: dotnet test
 
     - name: Add NuGet source
-      run: nuget sources Add -Name "GitHub oledid" -Source "https://nuget.pkg.github.com/oledid/index.json" -UserName oledid -Password ${{ secrets.GITHUB_TOKEN }}
+      run: nuget source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/oledid/index.json" -UserName oledid -Password GH_TOKEN
 
     - name: NuGet pack
       run: pwsh ./NuGet/pack.ps1
       
     - name: Push to GitHub packages
-      run: nuget push "oledid.SyntaxImprovement.*.nupkg" -Source "GitHub oledid"
+      run: nuget push "oledid.SyntaxImprovement.*.nupkg" -Source "GitHub"
 

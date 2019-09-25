@@ -5,7 +5,7 @@ on: [push]
 jobs:
   build:
 
-    runs-on: windows-latest
+    runs-on: ubuntu-latest
     
     steps:
     - uses: actions/checkout@v1
@@ -34,4 +34,4 @@ jobs:
       
 
     - name: Diagnostics
-      run: dir /s && type version.txt
+      run: find . && cat version.txt

@@ -5,7 +5,7 @@ on: [push]
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
 
     steps:
     - uses: actions/checkout@v1
@@ -16,18 +16,18 @@ jobs:
         args: /github/workspace /nofetch /exec /bin/sh /execargs "-c \"echo $GitVersion_FullSemVer > /github/workspace/version.txt\""
 
     - name: Echo Git version
-      run: cat version.txt
+      run: type version.txt
 
     - name: Patch AssemblyInfos
-      run: pwsh update-assemblyversion.ps1
+      run: powershell update-assemblyversion.ps1
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 2.2.108
-    
-    - name: Install NuGet client
-      run: sudo apt-get install nuget && wget https://dist.nuget.org/win-x86-commandline/latest/nuget.exe
+
+    - name: Install NuGet
+      run: choco install nuget.commandline
 
     - name: Build with dotnet
       run: dotnet build --configuration Release
@@ -36,11 +36,11 @@ jobs:
       run: dotnet test
 
     - name: Add NuGet source
-      run: mono nuget.exe source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/oledid/oledid.SyntaxImprovement/index.json" -UserName oledid -Password ${{ secrets.GITHUB_TOKEN }}
+      run: nuget source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/oledid/oledid.SyntaxImprovement/index.json" -UserName oledid -Password ${{ secrets.GITHUB_TOKEN }}
 
     - name: NuGet pack
-      run: pwsh ./NuGet/pack.ps1
-      
+      run: powershell ./NuGet/pack.ps1
+
     - name: Push to GitHub packages
-      run: mono nuget.exe push "oledid.SyntaxImprovement.*.nupkg" -Source "GitHub"
+      run: nuget.exe push "oledid.SyntaxImprovement.*.nupkg" -Source "GitHub"
 

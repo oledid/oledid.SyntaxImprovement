@@ -5,15 +5,34 @@ on: [push]
 jobs:
   build:
 
-    runs-on: ubuntu-latest
+    runs-on: windows-latest
     
     steps:
     - uses: actions/checkout@v1
+    
+    - name: Get Git Version
+      uses: docker://gittools/gitversion:5.0.2-beta1-27-linux-centos-7-netcoreapp2.2
+      with:
+        args: /github/workspace /nofetch /exec /bin/sh /execargs "-c \"echo $GitVersion_FullSemVer > /github/workspace/version.txt\""
+    
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1
       with:
         dotnet-version: 2.2.108
+        
     - name: Build with dotnet
       run: dotnet build --configuration Release
+      
     - name: Test with dotnet
       run: dotnet test
+      
+    - name: Add NuGet source
+      run: nuget source Add -Name "GitHub oledid" -Source "https://nuget.pkg.github.com/oledid/index.json" -UserName oledid -Password ${{ secrets.GITHUB_TOKEN }}
+      
+    - name: NuGet pack
+      run: ./NuGet/pack.ps1
+      
+
+    - name: Diagnostics
+      run: dir /s
+      run: type version.txt

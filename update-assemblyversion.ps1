@@ -1,10 +1,11 @@
 $pattern = '^\[assembly: AssemblyVersion\("(.*)"\)\]'
 $assemblyFiles = Get-ChildItem -Recurse . AssemblyInfo.cs
 
-$versionTxt = Get-Content version.txt -First 1
-$splitVersion = ($versionTxt -replace "\+", ".").split(".")
+$contributorsJson = Get-Content contributors.json | out-string
+$contributors = ConvertFrom-Json $contributorsJson
+$numberOfCommits = ($contributors | Measure-Object -Property contributions -Sum).Sum
 
-$buildCounter = $splitVersion[3]
+$buildCounter = $numberOfCommits
 if ([string]::IsNullOrWhitespace($buildCounter)) {
 	$buildCounter = "0"
 }

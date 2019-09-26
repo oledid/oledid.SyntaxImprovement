@@ -1,16 +1,14 @@
-name: ASP.NET Core CI
-
+name: Build
 on: [push]
-
 jobs:
   build:
-
     runs-on: windows-latest
-
+    
     steps:
     - uses: actions/checkout@v1
-
+    
     - run: choco install nuget.commandline
+    
     - run: choco install curl
 
     - name: Download contributors json
@@ -38,4 +36,3 @@ jobs:
 
     - name: Push to GitHub packages
       run: nuget push "oledid.SyntaxImprovement.*.nupkg" -Source "https://nuget.pkg.github.com/oledid/index.json"
-

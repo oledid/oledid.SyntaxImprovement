@@ -38,3 +38,4 @@ jobs:
 
     - name: Push to GitHub packages
       run: nuget push "oledid.SyntaxImprovement.*.nupkg" -Source "https://nuget.pkg.github.com/oledid/index.json"
+

@@ -11,8 +11,8 @@ jobs:
 
     - run: choco install curl
 
-    - name: Download contributors.json
-      run: 'curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/oledid/oledid.SyntaxImprovement/contributors" > contributors.json'
+    - name: Download info about the last package
+      run: 'curl --silent -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://nuget.pkg.github.com/oledid/oledid.SyntaxImprovement/index.json" > nuget-index.json'
 
     - name: Prepare version
       run: pwsh prepare-version.ps1 -commitish ${{ github.sha }}
@@ -38,5 +38,5 @@ jobs:
       run: nuget push "oledid.SyntaxImprovement.*.nupkg" -Source "https://nuget.pkg.github.com/oledid/index.json"
 
     - name: Create release (draft)
-      run: 'curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/x-www-form-urlencoded" -d "@release-request.json" -X POST "https://api.github.com/repos/oledid/oledid.SyntaxImprovement/releases"'
+      run: 'curl --silent -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/x-www-form-urlencoded" -d "@release-request.json" -X POST "https://api.github.com/repos/oledid/oledid.SyntaxImprovement/releases" > nul'
 

@@ -6,7 +6,7 @@
 docs
 
 *.compiled.nuspec
-contributors.json
+nuget-index.json
 release-request.json
 
 oledid.SyntaxImprovement.xml

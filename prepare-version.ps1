@@ -9,11 +9,11 @@ param (
 $pattern = '^\[assembly: AssemblyVersion\("(.*)"\)\]'
 $assemblyFiles = Get-ChildItem -Recurse . AssemblyInfo.cs
 
-$contributorsJson = Get-Content contributors.json | out-string
-$contributors = ConvertFrom-Json $contributorsJson
-$numberOfCommits = ($contributors | Measure-Object -Property contributions -Sum).Sum
+$nugetIndexStr = Get-Content nuget-index.json | out-string
+$nugetIndexJson = ConvertFrom-Json $nugetIndexStr
+$lastPackageBuildNo = ($nugetIndexJson.items.upper | select-string -pattern '^\d+\.\d+\.(\d+).*').matches.groups[1].Value
 
-$buildCounter = $numberOfCommits
+$buildCounter = $lastPackageBuildNo
 if ([string]::IsNullOrWhitespace($buildCounter)) {
 	$buildCounter = "0"
 }

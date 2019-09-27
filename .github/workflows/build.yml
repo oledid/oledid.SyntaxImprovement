@@ -14,8 +14,8 @@ jobs:
     - name: Download contributors.json
       run: 'curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/oledid/oledid.SyntaxImprovement/contributors" > contributors.json'
 
-    - name: Patch AssemblyInfos
-      run: pwsh update-assemblyversion.ps1
+    - name: Prepare version
+      run: pwsh prepare-version.ps1 -commitish ${{ github.sha }}
 
     - name: Setup .NET Core
       uses: actions/setup-dotnet@v1

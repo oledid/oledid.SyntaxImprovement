@@ -1,3 +1,11 @@
+param (
+    [string]$commitish = "master"
+ )
+
+############################
+# Update Assembly version
+############################
+
 $pattern = '^\[assembly: AssemblyVersion\("(.*)"\)\]'
 $assemblyFiles = Get-ChildItem -Recurse . AssemblyInfo.cs
 
@@ -32,5 +40,9 @@ foreach ($file in $assemblyFiles) {
 	} | Set-Content $file.PSPath
 }
 
+##########################################################
+# Write the POST body for the GitHub API Release-command
+##########################################################
+
 write-host Creating GitHub API release-request.json
-'{ "tag_name": "v' + $newVersion + '", "target_commitish": "master", "name": "v' + $newVersion + '", "body": "GitHub Actions test-release", "draft": true, "prerelease": true }' | Out-File -FilePath "release-request.json"
+'{ "tag_name": "v' + $newVersion + '", "target_commitish": "' + $commitish + '", "name": "v' + $newVersion + '", "body": "Version ' + $newVersion + '", "draft": true, "prerelease": true }' | Out-File -FilePath "release-request.json"

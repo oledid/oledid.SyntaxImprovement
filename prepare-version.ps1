@@ -13,10 +13,7 @@ $nugetIndexStr = Get-Content nuget-index.json | out-string
 $nugetIndexJson = ConvertFrom-Json $nugetIndexStr
 $lastPackageBuildNo = ($nugetIndexJson.items.upper | select-string -pattern '^\d+\.\d+\.(\d+).*').matches.groups[1].Value
 
-$buildCounter = $lastPackageBuildNo
-if ([string]::IsNullOrWhitespace($buildCounter)) {
-	$buildCounter = "0"
-}
+$buildCounter = ([long]$lastPackageBuildNo + 1).ToString()
 
 $major = "0"
 $minor = "4"

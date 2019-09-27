@@ -16,8 +16,8 @@ $lastPackageBuildNo = ($nugetIndexJson.items.upper | select-string -pattern '^\d
 $buildCounter = ([long]$lastPackageBuildNo + 1).ToString()
 
 $major = "0"
-$minor = "4"
-$build = $buildCounter
+$minor = "5"
+$build = 0 #$buildCounter
 $revision = "0"
 $newVersion = "{0}.{1}.{2}" -f $major, $minor, $build
 $newAssemblyVersion = "{0}.{1}.{2}.{3}" -f $major, $minor, $build, $revision

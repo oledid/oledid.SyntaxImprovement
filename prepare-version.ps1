@@ -17,7 +17,7 @@ $buildCounter = ([long]$lastPackageBuildNo + 1).ToString()
 
 $major = "0"
 $minor = "5"
-$build = 0 #$buildCounter
+$build = $buildCounter
 $revision = "0"
 $newVersion = "{0}.{1}.{2}" -f $major, $minor, $build
 $newAssemblyVersion = "{0}.{1}.{2}.{3}" -f $major, $minor, $build, $revision
@@ -42,4 +42,4 @@ foreach ($file in $assemblyFiles) {
 ##########################################################
 
 write-host Creating GitHub API release-request.json
-'{ "tag_name": "v' + $newVersion + '", "target_commitish": "' + $commitish + '", "name": "v' + $newVersion + '", "body": "Version ' + $newVersion + '", "draft": true, "prerelease": true }' | Out-File -FilePath "release-request.json"
+'{ "tag_name": "v' + $newVersion + '", "target_commitish": "' + $commitish + '", "name": "v' + $newVersion + '", "body": "Version ' + $newVersion + '", "draft": false, "prerelease": false }' | Out-File -FilePath "release-request.json"

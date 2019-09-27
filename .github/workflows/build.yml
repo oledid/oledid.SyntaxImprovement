@@ -3,16 +3,16 @@ on: [push]
 jobs:
   build:
     runs-on: windows-latest
-    
+
     steps:
     - uses: actions/checkout@v1
-    
+
     - run: choco install nuget.commandline
-    
+
     - run: choco install curl
 
-    - name: Download contributors json
-      run: curl.exe -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/oledid/oledid.SyntaxImprovement/contributors" > contributors.json
+    - name: Download contributors.json
+      run: 'curl -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://api.github.com/repos/oledid/oledid.SyntaxImprovement/contributors" > contributors.json'
 
     - name: Patch AssemblyInfos
       run: pwsh update-assemblyversion.ps1

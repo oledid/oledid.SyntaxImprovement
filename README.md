@@ -9,4 +9,3 @@ A collection of extension methods and helper functions to make a C# developer's 
 nuget sources Add -Name "GitHub oledid" -Source "https://nuget.pkg.github.com/oledid/index.json"
 nuget install oledid.SyntaxImprovement
 ```
-

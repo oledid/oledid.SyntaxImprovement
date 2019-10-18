@@ -38,7 +38,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		private string CreateQuery(ParameterFactory parameterFactory)
 		{
 			var tableName = tableInformation.GetSchemaAndTableName();
-			var columns = tableInformation.GetColumnNames();
+			var columns = tableInformation.GetColumnNames(excludeIgnoredFields: true);
 			var whereQueryPart = WhereGenerator.CreateQuery(parameterFactory, whereStatement);
 			var orderByQueryPart = OrderByGenerator.CreateQuery(orderByStatements);
 			return

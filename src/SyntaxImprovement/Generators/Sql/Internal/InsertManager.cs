@@ -22,8 +22,8 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			foreach (var row in rowList)
 			{
 				var tableName = tableInformation.GetSchemaAndTableName();
-				var columns = tableInformation.GetColumnNames(excludeIdentityColumns: true, excludeComputedFields: true);
-				var values = tableInformation.GetColumnValues(row, excludeIdentityColumns: true, excludeComputedFields: true);
+				var columns = tableInformation.GetColumnNames(excludeIdentityColumns: true, excludeComputedFields: true, excludeIgnoredFields: true);
+				var values = tableInformation.GetColumnValues(row, excludeIdentityColumns: true, excludeComputedFields: true, excludeIgnoredFields: true);
 				var identityColumn = tableInformation.GetIdentityColumn();
 				query += "INSERT INTO " + tableName + " (" + string.Join(", ", columns) + ") SELECT " + string.Join(", ", values.Select(parameterFactory.Create)) + "; ";
 				if (identityColumn != null && rowList.Count == 1)

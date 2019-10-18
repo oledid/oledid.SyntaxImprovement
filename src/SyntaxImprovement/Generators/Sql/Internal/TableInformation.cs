@@ -30,9 +30,9 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			return schemaValue + "[" + tableName + "]";
 		}
 
-		public List<string> GetColumnNames(bool excludeIdentityColumns = false, bool excludeComputedFields = false)
+		public List<string> GetColumnNames(bool excludeIdentityColumns = false, bool excludeComputedFields = false, bool excludeIgnoredFields = false)
 		{
-			var columns = GetColumns(excludeIdentityColumns, excludeComputedFields);
+			var columns = GetColumns(excludeIdentityColumns, excludeComputedFields, excludeIgnoredFields);
 
 			var result = new List<string>();
 			foreach (var column in columns)
@@ -59,9 +59,9 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			return column;
 		}
 
-		public List<object> GetColumnValues(DatabaseTable instance, bool excludeIdentityColumns = false, bool excludeComputedFields = false)
+		public List<object> GetColumnValues(DatabaseTable instance, bool excludeIdentityColumns = false, bool excludeComputedFields = false, bool excludeIgnoredFields = false)
 		{
-			var columns = GetColumns(excludeIdentityColumns, excludeComputedFields);
+			var columns = GetColumns(excludeIdentityColumns, excludeComputedFields, excludeIgnoredFields);
 
 			var result = new List<object>();
 			foreach (var column in columns)
@@ -73,12 +73,14 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			return result;
 		}
 
-		public IEnumerable<PropertyInfo> GetColumns(bool excludeIdentityColumns = false, bool excludeComputedFields = false)
+		public IEnumerable<PropertyInfo> GetColumns(bool excludeIdentityColumns = false, bool excludeComputedFields = false, bool excludeIgnoredFields = false)
 		{
 			return typeof(TableType).GetProperties(BindingFlags.Public | BindingFlags.Instance)
 				.Where(column =>
 					(excludeIdentityColumns == false || Attribute.IsDefined(column, typeof(IsIdentityAttribute)) == false)
-					&& (excludeComputedFields == false || Attribute.IsDefined(column, typeof(IsComputedAttribute)) == false))
+					&& (excludeComputedFields == false || Attribute.IsDefined(column, typeof(IsComputedAttribute)) == false)
+					&& (excludeIgnoredFields == false || Attribute.IsDefined(column, typeof(IgnoreAttribute)) == false)
+				)
 				.ToList();
 		}
 

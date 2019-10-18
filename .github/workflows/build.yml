@@ -25,8 +25,11 @@ jobs:
     - name: Build with dotnet
       run: dotnet build --configuration Release
 
+    - name: Publish test-exe
+      run: dotnet publish .\src\SyntaxImprovement.Tests\SyntaxImprovement.Tests.csproj --self-contained --runtime win-x64 /p:UseAppHost=true
+
     - name: Test with dotnet
-      run: dotnet test
+      run: dotnet test --no-build .\src\SyntaxImprovement.Tests\SyntaxImprovement.Tests.csproj
 
     - name: Add NuGet source
       run: nuget source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/oledid/index.json" -UserName oledid -Password ${{ secrets.GITHUB_TOKEN }}

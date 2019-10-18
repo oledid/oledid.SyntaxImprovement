@@ -16,7 +16,7 @@ $lastPackageBuildNo = ($nugetIndexJson.items.upper | select-string -pattern '^\d
 $buildCounter = ([long]$lastPackageBuildNo + 1).ToString()
 
 $major = "0"
-$minor = "6"
+$minor = "7"
 $build = $buildCounter
 $revision = "0"
 $newVersion = "{0}.{1}.{2}" -f $major, $minor, $build

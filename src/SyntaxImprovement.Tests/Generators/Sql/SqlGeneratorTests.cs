@@ -137,6 +137,64 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
 			}
 
+			class It_can_update_entire_model_Class : DatabaseTable
+			{
+				[IsPrimaryKey]
+				public int Id { get; set; }
+				[IsIdentity]
+				public int Counter { get; set; }
+				public string FirstName { get; set; }
+				public string LastName { get; set; }
+				[IsComputed]
+				public string FullName { get; set; }
+				[Ignore]
+				public Guid InternalField { get; set; }
+				public bool IsAdmin { get; set; }
+
+				public override string GetTableName() => "Table";
+			}
+
+			[Fact]
+			public void It_can_update_entire_model()
+			{
+				var original = new It_can_update_entire_model_Class
+				{
+					Id = 2,
+					Counter = 1337,
+					FirstName = "Ole",
+					LastName = "Did",
+					FullName = "Ole Did",
+					InternalField = Guid.Empty,
+					IsAdmin = false
+				};
+
+				var changed = new It_can_update_entire_model_Class
+				{
+					Id = 5,
+					Counter = 1338,
+					FirstName = "Ole M",
+					LastName = "Did",
+					FullName = "Ole M Did",
+					InternalField = Guid.NewGuid(),
+					IsAdmin = true
+				};
+
+				var query = new Update<It_can_update_entire_model_Class>()
+					.Set(changed)
+					.Set(e => e.LastName, "Diddy")
+					.Where(e => e.Id == original.Id)
+					.ToQuery();
+
+				Assert.Equal("UPDATE [Table] SET [Id] = @p1, [FirstName] = @p2, [IsAdmin] = @p4, [LastName] = @p5 WHERE [Id] = @p0", query.QueryText);
+				Assert.Equal(2, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+				Assert.Equal(5, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+				Assert.Equal("Ole M", ((IDictionary<string, object>)((dynamic)query).Parameters)["p2"]);
+				Assert.Equal("Did", ((IDictionary<string, object>)((dynamic)query).Parameters)["p3"]);
+				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["p4"]);
+				Assert.Equal("Diddy", ((IDictionary<string, object>)((dynamic)query).Parameters)["p5"]);
+				Assert.Throws<KeyNotFoundException>(() => ((IDictionary<string, object>)((dynamic)query).Parameters)["p6"]);
+			}
+
 			[Fact]
 			public void It_can_update_boolean_fields()
 			{

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Linq.Expressions;
 
 namespace oledid.SyntaxImprovement.Generators.Sql.Internal
@@ -55,6 +56,11 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			var expressions = new List<string>();
 			foreach (var setExpression in setExpressions)
 			{
+				var existingIndex = expressions.FindIndex(str => str.StartsWith(setExpression.GetColumnName()));
+				if (existingIndex >= 0)
+				{
+					expressions.RemoveAt(existingIndex);
+				}
 				expressions.Add(setExpression.GetColumnName() + " = " + parameterFactory.Create(setExpression.Value));
 			}
 

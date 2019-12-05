@@ -28,6 +28,9 @@ jobs:
     - name: Test with dotnet
       run: dotnet test
 
+    - name: Pack
+      run: pwsh -Command "dotnet pack --configuration Release /p:Version=$env:oledid_syntaximprovement_build_version"
+
     - name: Add NuGet source
       run: nuget source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/oledid/index.json" -UserName oledid -Password ${{ secrets.GITHUB_TOKEN }}
 

@@ -22,6 +22,8 @@ $revision = "0"
 $newVersion = "{0}.{1}.{2}" -f $major, $minor, $build
 $newAssemblyVersion = "{0}.{1}.{2}.{3}" -f $major, $minor, $build, $revision
 
+$env:oledid_syntaximprovement_build_version = "{0}.{1}.{2}-beta" -f $major, $minor, $build
+
 foreach ($file in $assemblyFiles) {
 	(Get-Content $file.PSPath) | ForEach-Object {
 		if ($_ -match $pattern) {

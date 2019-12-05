@@ -14,4 +14,4 @@ $content = $content -replace '\$version\$',$versionStr
 $content = $content -replace '\$commit\$',$commitish
 $content | Out-File "$root/oledid.SyntaxImprovement.compiled.nuspec"
 
-& nuget pack oledid.SyntaxImprovement.compiled.nuspec
+& nuget pack oledid.SyntaxImprovement.compiled.nuspec -Symbols -SymbolPackageFormat snupkg

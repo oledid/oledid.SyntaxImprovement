@@ -4,9 +4,9 @@
 		<id>oledid.SyntaxImprovement</id>
 		<version>$version$</version>
 		<authors>oledid</authors>
-		<licenseUrl>https://github.com/oledid/oledid.SyntaxImprovement/blob/master/LICENSE</licenseUrl>
+		<license>MIT</license>
 		<projectUrl>https://github.com/oledid/oledid.SyntaxImprovement</projectUrl>
-		<repository type="git" url="https://github.com/oledid/oledid.SyntaxImprovement" />
+		<repository type="git" url="https://github.com/oledid/oledid.SyntaxImprovement.git" branch="master" commit="$commit$" />
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>
 		<description>A collection of extension methods and helper functions to make a C# developer's life easier.</description>
 		<copyright>Copyright Ole Morten Didriksen 2018</copyright>

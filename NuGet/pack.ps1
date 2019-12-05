@@ -1,3 +1,7 @@
+param (
+    [string]$commitish = "master"
+ )
+
 $thisPath = $MyInvocation.MyCommand.Definition
 $root = Resolve-Path "$thisPath/../.."
 $version = [System.Reflection.Assembly]::LoadFile("$root/src/SyntaxImprovement/bin/Release/netstandard2.0/oledid.SyntaxImprovement.dll").GetName().Version
@@ -7,6 +11,7 @@ Write-Host "Setting .nuspec version tag to $versionStr"
 
 $content = (Get-Content $root/NuGet/oledid.SyntaxImprovement.nuspec) 
 $content = $content -replace '\$version\$',$versionStr
+$content = $content -replace '\$commit\$',$commitish
 $content | Out-File "$root/oledid.SyntaxImprovement.compiled.nuspec"
 
 & nuget pack oledid.SyntaxImprovement.compiled.nuspec

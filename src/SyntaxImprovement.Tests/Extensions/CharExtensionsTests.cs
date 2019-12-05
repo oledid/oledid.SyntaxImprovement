@@ -36,8 +36,12 @@ namespace oledid.SyntaxImprovement.Tests.Extensions
 				Assert.False('@'.IsNumber());
 			}
 
+		}
+
+		public class IsLetterAtoZ
+		{
 			[Fact]
-			public void It_returns_true_if_the_char_is_a_letter_between_a_and_z()
+			public void It_returns_true_if_the_char_is_a_letter_between_a_and_Z()
 			{
 				Assert.True('A'.IsLetterAtoZ());
 				Assert.True('b'.IsLetterAtoZ());
@@ -68,7 +72,7 @@ namespace oledid.SyntaxImprovement.Tests.Extensions
 			}
 
 			[Fact]
-			public void It_returns_false_if_the_char_is_not_a_letter_between_a_and_z()
+			public void It_returns_false_if_the_char_is_not_a_letter_between_A_and_z()
 			{
 				Assert.False('1'.IsLetterAtoZ());
 				Assert.False('5'.IsLetterAtoZ());
@@ -80,6 +84,32 @@ namespace oledid.SyntaxImprovement.Tests.Extensions
 				Assert.False(','.IsLetterAtoZ());
 				Assert.False('"'.IsLetterAtoZ());
 				Assert.False('@'.IsLetterAtoZ());
+			}
+		}
+
+		public class IsUppercaseAtoZ
+		{
+			[Fact]
+			public void It_validates_correctly()
+			{
+				Assert.True('A'.IsUppercaseLetterAtoZ());
+				Assert.True('Z'.IsUppercaseLetterAtoZ());
+				Assert.False('a'.IsUppercaseLetterAtoZ());
+				Assert.False('0'.IsUppercaseLetterAtoZ());
+				Assert.False('Æ'.IsUppercaseLetterAtoZ());
+			}
+		}
+
+		public class IsLowercaseAtoZ
+		{
+			[Fact]
+			public void It_validates_correctly()
+			{
+				Assert.True('a'.IsLowercaseLetterAtoZ());
+				Assert.True('z'.IsLowercaseLetterAtoZ());
+				Assert.False('A'.IsLowercaseLetterAtoZ());
+				Assert.False('0'.IsLowercaseLetterAtoZ());
+				Assert.False('æ'.IsLowercaseLetterAtoZ());
 			}
 		}
 	}

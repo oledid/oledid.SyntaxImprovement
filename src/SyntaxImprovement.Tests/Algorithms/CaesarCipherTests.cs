@@ -1,5 +1,5 @@
 ﻿using System;
-using oledid.SyntaxImprovement.Algorithms.Crypto;
+using oledid.SyntaxImprovement.Algorithms.Cryptography;
 using Xunit;
 
 namespace oledid.SyntaxImprovement.Tests.Algorithms
@@ -10,7 +10,7 @@ namespace oledid.SyntaxImprovement.Tests.Algorithms
 		public void TestRot13()
 		{
 			var secret = "OlEdId";
-			var expected = "BYRQVQ";
+			var expected = "ByRqVq";
 			var actual = CaesarCipher.ShiftCharacters(secret, 13);
 			Assert.Equal(expected, actual);
 		}

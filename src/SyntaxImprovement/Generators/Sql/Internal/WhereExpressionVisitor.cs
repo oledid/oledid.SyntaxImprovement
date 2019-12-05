@@ -53,12 +53,6 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 				CheckIfIsSingleBooleanStatement();
 				TryFinishStatement();
 			}
-			else
-			{
-				var value = GetValueFromConstant(node);
-				valueStack.Push(value);
-				TryFinishStatement();
-			}
 
 			return base.VisitMember(node);
 		}

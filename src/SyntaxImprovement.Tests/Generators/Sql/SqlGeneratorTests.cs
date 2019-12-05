@@ -105,6 +105,16 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 				Assert.Equal("SELECT [Id], [Name] FROM [Person] WHERE [Name] LIKE @p0;", query.QueryText);
 				Assert.Equal("%Pete%", ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
 			}
+
+			[Fact]
+			public void It_does_not_have_the_bug_described_in_issue_2()
+			{
+				var idString = "DeviceId";
+				var query = new Select<BooleanTestModel>().Where(model => model.IdStr == idString && model.IsActive == true).ToQuery();
+				Assert.Equal("SELECT [IdStr], [IsActive] FROM [BooleanTestModel] WHERE ([IdStr] = @p0) AND ([IsActive] = @p1);", query.QueryText);
+				Assert.Equal(idString, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+			}
 		}
 
 		public class UpdateTests

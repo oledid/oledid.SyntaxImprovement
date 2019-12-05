@@ -4,7 +4,7 @@
 		<id>oledid.SyntaxImprovement</id>
 		<version>$version$</version>
 		<authors>oledid</authors>
-		<license>MIT</license>
+		<license type="expression">MIT</license>
 		<projectUrl>https://github.com/oledid/oledid.SyntaxImprovement</projectUrl>
 		<repository type="git" url="https://github.com/oledid/oledid.SyntaxImprovement.git" branch="master" commit="$commit$" />
 		<requireLicenseAcceptance>false</requireLicenseAcceptance>

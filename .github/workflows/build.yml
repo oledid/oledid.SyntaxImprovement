@@ -31,6 +31,9 @@ jobs:
     - name: Pack
       run: pwsh pack.ps1
 
+    - name: List all files
+      run: pwsh -Command "ls *.nupkg -Recurse"
+
     - name: Add NuGet source
       run: nuget source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/oledid/index.json" -UserName oledid -Password ${{ secrets.GITHUB_TOKEN }}
 

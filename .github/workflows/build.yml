@@ -31,14 +31,14 @@ jobs:
     - name: Pack
       run: pwsh pack.ps1
 
-    - name: List all files
-      run: pwsh -Command "ls *.nupkg -Recurse"
-
     - name: Add NuGet source
       run: nuget source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/oledid/index.json" -UserName oledid -Password ${{ secrets.GITHUB_TOKEN }}
 
+    - name: List all *.nupkg
+      run: pwsh -Command "ls *.nupkg -Recurse"
+
     - name: Push to GitHub packages
-      run: nuget push "src/SyntaxImprovement/bin/Release/oledid.SyntaxImprovement.*.nupkg" -Source "https://nuget.pkg.github.com/oledid/index.json"
+      run: nuget push "D:\a\oledid.SyntaxImprovement\oledid.SyntaxImprovement\src\SyntaxImprovement\bin\Release\oledid.SyntaxImprovement.*.nupkg" -Source "https://nuget.pkg.github.com/oledid/index.json"
 
     - name: Create release
       run: 'curl --silent -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/x-www-form-urlencoded" -d "@release-request.json" -X POST "https://api.github.com/repos/oledid/oledid.SyntaxImprovement/releases" > curl-result.txt'

@@ -33,6 +33,15 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 
 		protected override Expression VisitMember(MemberExpression node)
 		{
+			var isNullable = IsNullableType(node.Type);
+			if (isNullable)
+			{
+				var expression = Visit(node.Expression);
+
+				if (expression.NodeType == ExpressionType.Constant)
+					return base.VisitMember(node);
+			}
+
 			try
 			{
 				var value = GetValueFromConstant(node);
@@ -55,6 +64,11 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			}
 
 			return base.VisitMember(node);
+		}
+
+		private static bool IsNullableType(Type type)
+		{
+			return type.IsClass == false && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
 		}
 
 		protected override Expression VisitMethodCall(MethodCallExpression node)

@@ -118,10 +118,10 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 				}
 
 				{
-					var idString = "DeviceId";
-					var query = new Select<BooleanTestModel>().Where(model => model.IdStr == idString && model.IsActive == false).ToQuery();
-					Assert.Equal("SELECT [IdStr], [IsActive] FROM [BooleanTestModel] WHERE ([IdStr] = @p0) AND ([IsActive] = @p1);", query.QueryText);
-					Assert.Equal(idString, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+					long? id = 28;
+					var query = new Select<TestEntity>().Where(model => model.Id == id.Value && model.IsDeleted == false).ToQuery();
+					Assert.Equal("SELECT [Id], [IsDeleted] FROM [Test] WHERE ([Id] = @p0) AND ([IsDeleted] = @p1);", query.QueryText);
+					Assert.Equal(id, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
 					Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
 				}
 			}

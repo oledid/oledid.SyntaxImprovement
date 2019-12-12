@@ -109,11 +109,21 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 			[Fact]
 			public void It_does_not_have_the_bug_described_in_issue_2()
 			{
-				var idString = "DeviceId";
-				var query = new Select<BooleanTestModel>().Where(model => model.IdStr == idString && model.IsActive == true).ToQuery();
-				Assert.Equal("SELECT [IdStr], [IsActive] FROM [BooleanTestModel] WHERE ([IdStr] = @p0) AND ([IsActive] = @p1);", query.QueryText);
-				Assert.Equal(idString, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
-				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+				{
+					var idString = "DeviceId";
+					var query = new Select<BooleanTestModel>().Where(model => model.IdStr == idString && model.IsActive == true).ToQuery();
+					Assert.Equal("SELECT [IdStr], [IsActive] FROM [BooleanTestModel] WHERE ([IdStr] = @p0) AND ([IsActive] = @p1);", query.QueryText);
+					Assert.Equal(idString, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+					Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+				}
+
+				{
+					var idString = "DeviceId";
+					var query = new Select<BooleanTestModel>().Where(model => model.IdStr == idString && model.IsActive == false).ToQuery();
+					Assert.Equal("SELECT [IdStr], [IsActive] FROM [BooleanTestModel] WHERE ([IdStr] = @p0) AND ([IsActive] = @p1);", query.QueryText);
+					Assert.Equal(idString, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+					Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+				}
 			}
 		}
 

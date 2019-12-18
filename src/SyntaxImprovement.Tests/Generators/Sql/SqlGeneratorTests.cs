@@ -149,6 +149,18 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 					Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
 				}
 			}
+
+			[Fact]
+			public void It_understands_unary_not()
+			{
+				{
+					long id = 0;
+					var query = new Select<LongTestEntity>().Where(model => model.Id == id && model.IsDeleted == !false).ToQuery();
+					Assert.Equal("SELECT [Id], [IsDeleted] FROM [LongTest] WHERE ([Id] = @p0) AND ([IsDeleted] = @p1);", query.QueryText);
+					Assert.Equal(id, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+					Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+				}
+			}
 		}
 
 		public class UpdateTests

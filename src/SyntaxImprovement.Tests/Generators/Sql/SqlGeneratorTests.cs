@@ -92,7 +92,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 			[Fact]
 			public void It_can_do_both_where_and_order_by()
 			{
-				var list = new List<int> {1, 3, 5};
+				var list = new List<int> { 1, 3, 5 };
 
 				var query = new Select<Person>()
 					.Where(person => list.Contains(person.Id))
@@ -176,14 +176,11 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 			[Fact]
 			public void It_understands_gt_and_lt()
 			{
-				{
-					long id = 1337;
-					var query = new Select<LongTestEntity>().Where(model => model.Id > 1000 && model.IsDeleted == !true && model.Id <= 1001L).ToQuery();
-					Assert.Equal("SELECT [Id], [IsDeleted] FROM [LongTest] WHERE (([Id] > @p0) AND ([IsDeleted] = @p1)) AND ([Id] <= @p2);", query.QueryText);
-					Assert.Equal(1000L, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
-					Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
-					Assert.Equal(1001L, ((IDictionary<string, object>)((dynamic)query).Parameters)["p2"]);
-				}
+				var query = new Select<LongTestEntity>().Where(model => model.Id > 1000 && model.IsDeleted == !true && model.Id <= 1001L).ToQuery();
+				Assert.Equal("SELECT [Id], [IsDeleted] FROM [LongTest] WHERE (([Id] > @p0) AND ([IsDeleted] = @p1)) AND ([Id] <= @p2);", query.QueryText);
+				Assert.Equal(1000L, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+				Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+				Assert.Equal(1001L, ((IDictionary<string, object>)((dynamic)query).Parameters)["p2"]);
 			}
 		}
 
@@ -341,8 +338,8 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 			[Fact]
 			public void It_generates_correct_insert_for_multi_objects_with_identity_column_and_param()
 			{
-				var peter = new Person {Name = "Peter"};
-				var roger = new Person {Name = "Roger"};
+				var peter = new Person { Name = "Peter" };
+				var roger = new Person { Name = "Roger" };
 				var query = new Insert<Person>().Add(peter, roger).ToQuery();
 
 				Assert.Equal("INSERT INTO [Person] ([Name]) SELECT @p0; INSERT INTO [Person] ([Name]) SELECT @p1; ", query.QueryText);

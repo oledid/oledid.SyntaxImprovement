@@ -22,6 +22,42 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 
 		public override Expression Visit(Expression node)
 		{
+			if (node is MethodCallExpression methodCallExpression && methodCallExpression.Method.Name == "Contains")
+			{
+				var argumentVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory());
+				argumentVisitor.Visit(methodCallExpression.Arguments);
+				var callVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory());
+				callVisitor.Visit(methodCallExpression.Object);
+
+				if (methodCallExpression.Method.DeclaringType == typeof(string))
+				{
+					stringBuilder.Append(callVisitor.stringBuilder);
+					stringBuilder.Append(GetOperatorExpression(ExpressionType.Modulo, isCollection: false));
+					stringBuilder.Append(parameterFactory.Create("%" + argumentVisitor.parameterFactory.parameters.Single().Value + "%"));
+					return node;
+				}
+				else if (methodCallExpression.Method.DeclaringType.IsGenericType && methodCallExpression.Method.DeclaringType.GetGenericTypeDefinition() == typeof(List<>))
+				{
+					stringBuilder.Append(argumentVisitor.stringBuilder);
+					stringBuilder.Append(GetOperatorExpression(ExpressionType.Modulo, isCollection: true));
+					stringBuilder.Append('(');
+					for (var i = 0; i < callVisitor.parameterFactory.parameters.Count; i++)
+					{
+						var parameter = callVisitor.parameterFactory.parameters[i];
+						var value = parameter.Value;
+						var valueExpression = parameterFactory.Create(value);
+						stringBuilder.Append(valueExpression);
+						if (i != callVisitor.parameterFactory.parameters.Count - 1)
+						{
+							stringBuilder.Append(',');
+							stringBuilder.Append(' ');
+						}
+					}
+					stringBuilder.Append(')');
+					return node;
+				}
+			}
+
 			if (node is MemberExpression memberExpression && memberExpression.Expression.Type == typeof(TableType) && memberExpression.Expression.NodeType == ExpressionType.Parameter)
 			{
 				var columnExpression = "[" + memberExpression.Member.Name + "]";
@@ -86,6 +122,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 					stringBuilder.Append(")");
 				}
 
+				var operatorIndex = stringBuilder.Length;
 				var operatorPlaceholder = "{{" + Guid.NewGuid() + "}}";
 				stringBuilder.Append(operatorPlaceholder);
 
@@ -99,7 +136,8 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 					stringBuilder.Append(")");
 				}
 
-				stringBuilder.Replace(operatorPlaceholder, GetOperatorExpression(node.NodeType, parameterFactory.LastOrNull()?.Value is ICollection));
+				var operatorExpression = GetOperatorExpression(node.NodeType, parameterFactory.LastOrNull()?.Value is ICollection);
+				stringBuilder.Replace(operatorPlaceholder, operatorExpression, operatorIndex, Guid.Empty.ToString().Length + "{{}}".Length);
 
 				operatorStack.Pop();
 				return node;

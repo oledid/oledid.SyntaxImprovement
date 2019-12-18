@@ -27,12 +27,23 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 			[Fact]
 			public void It_generates_correct_where_with_single_argument()
 			{
-				var query = new Select<Person>()
+				{
+					var query = new Select<Person>()
 					.Where(person => person.Name == "Peter")
 					.ToQuery();
 
-				Assert.Equal("SELECT [Id], [Name] FROM [Person] WHERE [Name] = @p0;", query.QueryText);
-				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+					Assert.Equal("SELECT [Id], [Name] FROM [Person] WHERE [Name] = @p0;", query.QueryText);
+					Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+				}
+
+				{
+					var query = new Select<Person>()
+					.Where(person => person.Name != "Peter")
+					.ToQuery();
+
+					Assert.Equal("SELECT [Id], [Name] FROM [Person] WHERE [Name] != @p0;", query.QueryText);
+					Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+				}
 			}
 
 			[Fact]
@@ -159,6 +170,19 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 					Assert.Equal("SELECT [Id], [IsDeleted] FROM [LongTest] WHERE ([Id] = @p0) AND ([IsDeleted] = @p1);", query.QueryText);
 					Assert.Equal(id, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
 					Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+				}
+			}
+
+			[Fact]
+			public void It_understands_gt_and_lt()
+			{
+				{
+					long id = 1337;
+					var query = new Select<LongTestEntity>().Where(model => model.Id > 1000 && model.IsDeleted == !true && model.Id <= 1001L).ToQuery();
+					Assert.Equal("SELECT [Id], [IsDeleted] FROM [LongTest] WHERE (([Id] > @p0) AND ([IsDeleted] = @p1)) AND ([Id] <= @p2);", query.QueryText);
+					Assert.Equal(1000L, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+					Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+					Assert.Equal(1001L, ((IDictionary<string, object>)((dynamic)query).Parameters)["p2"]);
 				}
 			}
 		}

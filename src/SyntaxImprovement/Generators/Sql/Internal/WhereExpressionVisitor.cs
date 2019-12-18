@@ -3,178 +3,250 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
-using System.Reflection;
+using System.Text;
 
 namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 {
 	internal class WhereExpressionVisitor<TableType> : ExpressionVisitor where TableType : DatabaseTable, new()
 	{
 		private readonly ParameterFactory parameterFactory;
+		private readonly StringBuilder stringBuilder;
 		private readonly Stack<ExpressionType> operatorStack;
-		private readonly Stack<MemberInfo> memberStack;
-		private readonly Stack<object> valueStack;
-		private readonly List<string> whereStatements;
 
 		internal WhereExpressionVisitor(ParameterFactory parameterFactory)
 		{
 			this.parameterFactory = parameterFactory;
+			stringBuilder = new StringBuilder();
 			operatorStack = new Stack<ExpressionType>();
-			memberStack = new Stack<MemberInfo>();
-			valueStack = new Stack<object>();
-			whereStatements = new List<string>();
 		}
 
-		protected override Expression VisitBinary(BinaryExpression node)
+		public override Expression Visit(Expression node)
 		{
-			operatorStack.Push(node.NodeType);
-			TryFinishStatement();
-			return base.VisitBinary(node);
-		}
-
-		protected override Expression VisitMember(MemberExpression node)
-		{
-			var isNullable = IsNullableType(node.Type);
-			if (isNullable)
+			if (node is MemberExpression memberExpression && memberExpression.Expression.Type == typeof(TableType) && memberExpression.Expression.NodeType == ExpressionType.Parameter)
 			{
-				var expression = Visit(node.Expression);
-
-				if (expression.NodeType == ExpressionType.Constant)
-					return base.VisitMember(node);
+				var columnExpression = "[" + memberExpression.Member.Name + "]";
+				stringBuilder.Append(columnExpression);
+				return node;
 			}
 
-			try
+			if (node is ConstantExpression constantExpression)
 			{
-				var value = GetValueFromConstant(node);
-				if (value != null)
+				if (constantExpression.Value.GetType().IsClass == false || constantExpression.Value is string)
 				{
-					valueStack.Push(value);
-					TryFinishStatement();
+					var value = constantExpression.Value;
+					var valueExpression = operatorStack.Peek() == ExpressionType.Modulo
+						? parameterFactory.Create("%" + value + "%")
+						: parameterFactory.Create(value);
+					stringBuilder.Append(valueExpression);
+					return node;
+				}
+				else
+				{
+					var fields = constantExpression.Value.GetType().GetFields();
+					if (fields.Length != 1)
+					{
+						throw new NotSupportedException();
+					}
+					var field = fields.Single();
+					var value = field.GetValue(constantExpression.Value);
+					var valueExpression = operatorStack.Peek() == ExpressionType.Modulo
+						? parameterFactory.Create("%" + value + "%")
+						: parameterFactory.Create(value);
+					stringBuilder.Append(valueExpression);
+					return node;
 				}
 			}
-			catch
+
+			if (node is BinaryExpression binaryExpression)
 			{
-				//
+				var addParantheses = binaryExpression.NodeType.In(ExpressionType.AndAlso, ExpressionType.OrElse);
+
+				operatorStack.Push(node.NodeType);
+
+				if (addParantheses)
+				{
+					stringBuilder.Append("(");
+				}
+				Visit(binaryExpression.Left);
+				if (addParantheses)
+				{
+					stringBuilder.Append(")");
+				}
+				var isCollection = false;
+
+				var operatorPlaceholder = "{{" + Guid.NewGuid() + "}}";
+				stringBuilder.Append(operatorPlaceholder);
+
+				if (addParantheses)
+				{
+					stringBuilder.Append("(");
+				}
+				Visit(binaryExpression.Right);
+				if (addParantheses)
+				{
+					stringBuilder.Append(")");
+				}
+
+				stringBuilder.Replace(operatorPlaceholder, GetOperatorExpression(node.NodeType, parameterFactory.LastOrNull()?.Value is ICollection));
+
+				operatorStack.Pop();
+				return node;
 			}
 
-			if (node.Expression != null && node.Expression.Type == typeof(TableType))
-			{
-				memberStack.Push(node.Member);
-				CheckIfIsSingleBooleanStatement();
-				TryFinishStatement();
-			}
-
-			return base.VisitMember(node);
+			return base.Visit(node);
 		}
 
-		private static bool IsNullableType(Type type)
-		{
-			return type.IsClass == false && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
-		}
+		//protected override Expression VisitBinary(BinaryExpression node)
+		//{
+		//	operatorStack.Push(node.NodeType);
+		//	TryFinishStatement();
+		//	return base.VisitBinary(node);
+		//}
 
-		protected override Expression VisitMethodCall(MethodCallExpression node)
-		{
-			if (node.Method.Name == "Contains")
-			{
-				operatorStack.Push(ExpressionType.Modulo);
-			}
-			else
-			{
-				throw new NotSupportedException("Unknown method " + node.Method.Name);
-			}
+		//protected override Expression VisitMember(MemberExpression node)
+		//{
+		//	var isNullable = IsNullableType(node.Type);
+		//	if (isNullable)
+		//	{
+		//		var expression = Visit(node.Expression);
 
-			return base.VisitMethodCall(node);
-		}
+		//		if (expression.NodeType == ExpressionType.Constant)
+		//			return base.VisitMember(node);
+		//	}
 
-		protected override Expression VisitConstant(ConstantExpression node)
-		{
-			if (node.Value.GetType().IsClass == false || node.Value is string)
-			{
-				valueStack.Push(node.Value);
-				TryFinishStatement();
-			}
-			return base.VisitConstant(node);
-		}
+		//	try
+		//	{
+		//		var value = GetValueFromConstant(node);
+		//		if (value != null)
+		//		{
+		//			valueStack.Push(value);
+		//			TryFinishStatement();
+		//		}
+		//	}
+		//	catch
+		//	{
+		//		//
+		//	}
 
-		private static object GetValueFromConstant(MemberExpression member)
-		{
-			var objectMember = Expression.Convert(member, typeof(object));
-			var getterLambda = Expression.Lambda<Func<object>>(objectMember);
-			var getter = getterLambda.Compile();
-			return getter.Invoke();
-		}
+		//	if (node.Expression != null && node.Expression.Type == typeof(TableType))
+		//	{
+		//		memberStack.Push(node.Member);
+		//		CheckIfIsSingleBooleanStatement();
+		//		TryFinishStatement();
+		//	}
 
-		private void CheckIfIsSingleBooleanStatement()
-		{
-			if (memberStack.Any() == false)
-				return;
+		//	return base.VisitMember(node);
+		//}
 
-			var memberPeek = memberStack.Peek();
-			var memberProperty = memberPeek as PropertyInfo;
-			if (memberProperty == null || memberProperty.PropertyType != typeof(bool))
-				return;
+		//private static bool IsNullableType(Type type)
+		//{
+		//	return type.IsClass == false && type.IsGenericType && type.GetGenericTypeDefinition() == typeof(Nullable<>);
+		//}
 
-			if (operatorStack.Any() && operatorStack.Peek().In(ExpressionType.Equal, ExpressionType.NotEqual))
-				return;
+		//protected override Expression VisitMethodCall(MethodCallExpression node)
+		//{
+		//	if (node.Method.Name == "Contains")
+		//	{
+		//		operatorStack.Push(ExpressionType.Modulo);
+		//	}
+		//	else
+		//	{
+		//		throw new NotSupportedException("Unknown method " + node.Method.Name);
+		//	}
 
-			var member = memberStack.Pop();
-			var hasMoreOperators = operatorStack.Any();
-			AddStatement(member, ExpressionType.Equal, true, hasMoreOperators);
-			TryAddCombinationStatement();
-		}
+		//	return base.VisitMethodCall(node);
+		//}
 
-		private void TryFinishStatement()
-		{
-			if (memberStack.Any() && valueStack.Any())
-				FinishStatement();
-		}
+		//protected override Expression VisitConstant(ConstantExpression node)
+		//{
+		//	if (node.Value.GetType().IsClass == false || node.Value is string)
+		//	{
+		//		valueStack.Push(node.Value);
+		//		TryFinishStatement();
+		//	}
+		//	return base.VisitConstant(node);
+		//}
 
-		private void FinishStatement()
-		{
-			var member = memberStack.Pop();
-			var @operator = operatorStack.Pop();
-			var value = valueStack.Pop();
-			var hasMoreOperators = operatorStack.Any() || whereStatements.Any();
-			AddStatement(member, @operator, value, hasMoreOperators);
-			TryAddCombinationStatement();
-		}
+		//private static object GetValueFromConstant(MemberExpression member)
+		//{
+		//	var objectMember = Expression.Convert(member, typeof(object));
+		//	var getterLambda = Expression.Lambda<Func<object>>(objectMember);
+		//	var getter = getterLambda.Compile();
+		//	return getter.Invoke();
+		//}
 
-		private void TryAddCombinationStatement()
-		{
-			if (operatorStack.Any())
-			{
-				AddOperatorStatement(operatorStack.Pop());
-			}
-		}
+		//private void CheckIfIsSingleBooleanStatement()
+		//{
+		//	if (memberStack.Any() == false)
+		//		return;
 
-		private void AddStatement(MemberInfo member, ExpressionType @operator, object value, bool hasMoreOperators)
-		{
-			var columnExpression = "[" + member.Name + "]";
-			var operatorExpression = GetOperatorExpression(@operator, isCollection: value is ICollection);
-			var valueExpression = operatorExpression == " LIKE "
-				? parameterFactory.Create("%" + value + "%")
-				: parameterFactory.Create(value);
-			var whereStatement = columnExpression + operatorExpression + valueExpression;
-			if (hasMoreOperators)
-			{
-				whereStatement = "(" + whereStatement + ")";
-			}
-			whereStatements.Add(whereStatement);
-		}
+		//	var memberPeek = memberStack.Peek();
+		//	var memberProperty = memberPeek as PropertyInfo;
+		//	if (memberProperty == null || memberProperty.PropertyType != typeof(bool))
+		//		return;
 
-		private void AddOperatorStatement(ExpressionType @operator)
-		{
-			switch (@operator)
-			{
-				case ExpressionType.OrElse:
-				case ExpressionType.AndAlso:
-					break;
-				default:
-					throw new NotSupportedException();
-			}
+		//	if (operatorStack.Any() && operatorStack.Peek().In(ExpressionType.Equal, ExpressionType.NotEqual))
+		//		return;
 
-			var operatorExpression = GetOperatorExpression(@operator, isCollection: false);
-			whereStatements.Add(operatorExpression);
-		}
+		//	var member = memberStack.Pop();
+		//	var hasMoreOperators = operatorStack.Any();
+		//	AddStatement(member, ExpressionType.Equal, true, hasMoreOperators);
+		//	TryAddCombinationStatement();
+		//}
+
+		//private void TryFinishStatement()
+		//{
+		//	if (memberStack.Any() && valueStack.Any())
+		//		FinishStatement();
+		//}
+
+		//private void FinishStatement()
+		//{
+		//	var member = memberStack.Pop();
+		//	var @operator = operatorStack.Pop();
+		//	var value = valueStack.Pop();
+		//	var hasMoreOperators = operatorStack.Any() || whereStatements.Any();
+		//	AddStatement(member, @operator, value, hasMoreOperators);
+		//	TryAddCombinationStatement();
+		//}
+
+		//private void TryAddCombinationStatement()
+		//{
+		//	if (operatorStack.Any())
+		//	{
+		//		AddOperatorStatement(operatorStack.Pop());
+		//	}
+		//}
+
+		//private void AddStatement(MemberInfo member, ExpressionType @operator, object value, bool hasMoreOperators)
+		//{
+		//	var columnExpression = "[" + member.Name + "]";
+		//	var operatorExpression = GetOperatorExpression(@operator, isCollection: value is ICollection);
+		//	var valueExpression = operatorExpression == " LIKE "
+		//		? parameterFactory.Create("%" + value + "%")
+		//		: parameterFactory.Create(value);
+		//	var whereStatement = columnExpression + operatorExpression + valueExpression;
+		//	if (hasMoreOperators)
+		//	{
+		//		whereStatement = "(" + whereStatement + ")";
+		//	}
+		//	whereStatements.Add(whereStatement);
+		//}
+
+		//private void AddOperatorStatement(ExpressionType @operator)
+		//{
+		//	switch (@operator)
+		//	{
+		//		case ExpressionType.OrElse:
+		//		case ExpressionType.AndAlso:
+		//			break;
+		//		default:
+		//			throw new NotSupportedException();
+		//	}
+
+		//	var operatorExpression = GetOperatorExpression(@operator, isCollection: false);
+		//	whereStatements.Add(operatorExpression);
+		//}
 
 		private static string GetOperatorExpression(ExpressionType @operator, bool isCollection)
 		{
@@ -207,7 +279,14 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 
 		public string GetQuery()
 		{
-			return string.Join("", whereStatements);
+			return stringBuilder.ToString();
 		}
+	}
+
+	public class BinaryOperation
+	{
+		public object A { get; set; }
+		public object B { get; set; }
+		public ExpressionType Operator { get; set; }
 	}
 }

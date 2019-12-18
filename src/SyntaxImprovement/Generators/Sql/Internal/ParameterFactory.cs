@@ -2,6 +2,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using System.Dynamic;
+using System.Linq;
 
 namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 {
@@ -56,5 +57,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 
 			return obj;
 		}
+
+		internal Parameter LastOrNull() => parameters?.LastOrDefault();
 	}
 }

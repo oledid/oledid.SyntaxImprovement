@@ -29,12 +29,25 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 				return node;
 			}
 
+			if (node is MemberExpression m)
+			{
+				var objectMember = Expression.Convert(m, typeof(object));
+				var getterLambda = Expression.Lambda<Func<object>>(objectMember);
+				var getter = getterLambda.Compile();
+				var value = getter.Invoke();
+				var valueExpression = operatorStack.Any() && operatorStack.Peek() == ExpressionType.Modulo
+					? parameterFactory.Create("%" + value + "%")
+					: parameterFactory.Create(value);
+				stringBuilder.Append(valueExpression);
+				return node;
+			}
+
 			if (node is ConstantExpression constantExpression)
 			{
 				if (constantExpression.Value.GetType().IsClass == false || constantExpression.Value is string)
 				{
 					var value = constantExpression.Value;
-					var valueExpression = operatorStack.Peek() == ExpressionType.Modulo
+					var valueExpression = operatorStack.Any() && operatorStack.Peek() == ExpressionType.Modulo
 						? parameterFactory.Create("%" + value + "%")
 						: parameterFactory.Create(value);
 					stringBuilder.Append(valueExpression);
@@ -49,7 +62,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 					}
 					var field = fields.Single();
 					var value = field.GetValue(constantExpression.Value);
-					var valueExpression = operatorStack.Peek() == ExpressionType.Modulo
+					var valueExpression = operatorStack.Any() && operatorStack.Peek() == ExpressionType.Modulo
 						? parameterFactory.Create("%" + value + "%")
 						: parameterFactory.Create(value);
 					stringBuilder.Append(valueExpression);
@@ -72,7 +85,6 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 				{
 					stringBuilder.Append(")");
 				}
-				var isCollection = false;
 
 				var operatorPlaceholder = "{{" + Guid.NewGuid() + "}}";
 				stringBuilder.Append(operatorPlaceholder);

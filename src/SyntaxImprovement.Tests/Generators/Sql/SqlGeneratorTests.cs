@@ -119,8 +119,32 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 
 				{
 					long? id = 28;
-					var query = new Select<TestEntity>().Where(model => model.Id == id.Value && model.IsDeleted == false).ToQuery();
-					Assert.Equal("SELECT [Id], [IsDeleted] FROM [Test] WHERE ([Id] = @p0) AND ([IsDeleted] = @p1);", query.QueryText);
+					var query = new Select<LongTestEntity>().Where(model => model.Id == id && model.IsDeleted == false).ToQuery();
+					Assert.Equal("SELECT [Id], [IsDeleted] FROM [LongTest] WHERE ([Id] = @p0) AND ([IsDeleted] = @p1);", query.QueryText);
+					Assert.Equal(id, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+					Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+				}
+
+				{
+					long? id = 28;
+					var query = new Select<LongTestEntity>().Where(model => model.Id == id.Value && model.IsDeleted == false).ToQuery();
+					Assert.Equal("SELECT [Id], [IsDeleted] FROM [LongTest] WHERE ([Id] = @p0) AND ([IsDeleted] = @p1);", query.QueryText);
+					Assert.Equal(id, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+					Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+				}
+
+				{
+					Guid? id = Guid.NewGuid();
+					var query = new Select<GuidTestEntity>().Where(model => model.Fk == id && model.IsDeleted == false).ToQuery();
+					Assert.Equal("SELECT [Id], [Fk], [IsDeleted] FROM [GuidTestEntity] WHERE ([Fk] = @p0) AND ([IsDeleted] = @p1);", query.QueryText);
+					Assert.Equal(id, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+					Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+				}
+
+				{
+					Guid? id = Guid.NewGuid();
+					var query = new Select<GuidTestEntity>().Where(model => model.Fk == id.Value && model.IsDeleted == false).ToQuery();
+					Assert.Equal("SELECT [Id], [Fk], [IsDeleted] FROM [GuidTestEntity] WHERE ([Fk] = @p0) AND ([IsDeleted] = @p1);", query.QueryText);
 					Assert.Equal(id, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
 					Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
 				}

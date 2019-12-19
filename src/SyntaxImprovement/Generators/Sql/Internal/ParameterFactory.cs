@@ -9,7 +9,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 	internal class ParameterFactory
 	{
 		private int currentParameterIterator;
-		private readonly List<Parameter> parameters;
+		internal readonly List<Parameter> parameters;
 
 		public ParameterFactory()
 		{

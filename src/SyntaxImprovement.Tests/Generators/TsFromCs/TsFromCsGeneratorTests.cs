@@ -1,5 +1,6 @@
 ﻿using oledid.SyntaxImprovement.Generators.TsFromCs;
 using System;
+using System.Collections.Generic;
 using Xunit;
 
 namespace oledid.SyntaxImprovement.Tests.Generators.TsFromCs
@@ -9,8 +10,35 @@ namespace oledid.SyntaxImprovement.Tests.Generators.TsFromCs
 		[Fact]
 		public void It_can_generate_dtos()
 		{
-			var result = TsFromCsGenerator.GenerateTypescriptInterfaceFromCsharpClass(typeof(PersonEntity), typeof(TypesEntity));
-			Assert.Equal("", result);
+			const string expected = @"interface IPersonEntity {
+	id: number;
+	name?: string;
+	isActive: boolean;
+	uniqueId: string;
+	createdOn: Date;
+	deletedOn?: Date;
+	favoriteTypes?: ITypesEntity;
+	parent?: IPersonEntity;
+	ignoredClass?: any;
+}
+
+interface ITypesEntity {
+	int: number;
+	nullableInt?: number;
+	nullableBool?: boolean;
+	long: number;
+	nullableLong?: number;
+	short: number;
+	nullableShort?: number;
+	string?: string;
+	nullableGuid?: string;
+	intArray: Array<number>;
+	stringList: Array<string>;
+	guidEnumerable: Array<string>;
+}
+";
+			var actual = TsFromCsGenerator.GenerateTypescriptInterfaceFromCsharpClass(typeof(PersonEntity), typeof(TypesEntity), typeof(IgnoredClass));
+			Assert.Equal(expected, actual);
 		}
 
 		public class PersonEntity
@@ -24,6 +52,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.TsFromCs
 
 			public TypesEntity FavoriteTypes { get; set; }
 			public PersonEntity Parent { get; set; }
+			public IgnoredClass IgnoredClass { get; set; }
 		}
 
 		public class TypesEntity
@@ -37,6 +66,18 @@ namespace oledid.SyntaxImprovement.Tests.Generators.TsFromCs
 			public short? NullableShort { get; set; }
 			public string String { get; set; }
 			public Guid? NullableGuid { get; set; }
+			public int[] intArray { get; set; }
+			public List<string> stringList { get; set; }
+			public IEnumerable<Guid> guidEnumerable { get; set; }
+
+			[TsFromCsIgnore]
+			public int IgnoredInt { get; set; }
+		}
+
+		[TsFromCsIgnore]
+		public class IgnoredClass
+		{
+			public int Id { get; set; }
 		}
 	}
 }

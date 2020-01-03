@@ -30,11 +30,17 @@ namespace oledid.SyntaxImprovement.Generators.TsFromCs
 
 			var stringBuilder = new StringBuilder();
 
+			foreach (var kvp in typeList.GroupBy(e => GetTsName(e)).Where(e => e.Count() > 1))
+			{
+				stringBuilder.Append($"error error // multiple classes with the same name: \"{kvp.Key}\", please correct by renaming a class or adding a TsFromCsNameAttribute");
+				return stringBuilder.ToString();
+			}
+
 			var index = 0;
-			foreach (var type in typeList)
+			foreach (var type in typeList.OrderBy(t => GetTsName(t)))
 			{
 				var isLastItem = ++index == typeList.Count;
-				var typeName = type.Name;
+				var typeName = GetTsName(type);
 				var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
 				stringBuilder
@@ -62,6 +68,12 @@ namespace oledid.SyntaxImprovement.Generators.TsFromCs
 			}
 
 			return stringBuilder.ToString();
+		}
+
+		private static string GetTsName(Type type)
+		{
+			var overrideAttribute = type.GetCustomAttribute<TsFromCsNameAttribute>();
+			return overrideAttribute?.Name ?? type.Name;
 		}
 
 		private static string GetTsType(Type type, IReadOnlyList<Type> knownTypes)

@@ -10,7 +10,10 @@ namespace oledid.SyntaxImprovement.Tests.Generators.TsFromCs
 		[Fact]
 		public void It_can_generate_dtos()
 		{
-			const string expected = @"interface IPersonEntity {
+			const string expected = @"interface IB {
+}
+
+interface IPersonEntity {
 	id: number;
 	name?: string;
 	isActive: boolean;
@@ -37,8 +40,16 @@ interface ITypesEntity {
 	guidEnumerable: Array<string>;
 }
 ";
-			var actual = TsFromCsGenerator.GenerateTypescriptInterfaceFromCsharpClass(typeof(PersonEntity), typeof(TypesEntity), typeof(IgnoredClass));
+			var actual = TsFromCsGenerator.GenerateTypescriptInterfaceFromCsharpClass(typeof(TypesEntity), typeof(PersonEntity), typeof(IgnoredClass), typeof(A));
 			Assert.Equal(expected, actual);
+
+			Assert.Equal(
+				expected: @"error error // multiple classes with the same name: ""PersonEntity"", please correct by renaming a class or adding a TsFromCsNameAttribute",
+				actual: TsFromCsGenerator.GenerateTypescriptInterfaceFromCsharpClass(typeof(PersonEntity), typeof(Container.PersonEntity)));
+
+			Assert.Equal(
+				expected: @"error error // multiple classes with the same name: ""PersonEntity"", please correct by renaming a class or adding a TsFromCsNameAttribute",
+				actual: TsFromCsGenerator.GenerateTypescriptInterfaceFromCsharpClass(typeof(PersonEntity), typeof(Container.SecondError)));
 		}
 
 		public class PersonEntity
@@ -78,6 +89,23 @@ interface ITypesEntity {
 		public class IgnoredClass
 		{
 			public int Id { get; set; }
+		}
+
+		public class Container
+		{
+			public class PersonEntity
+			{
+			}
+
+			[TsFromCsName("PersonEntity")]
+			public class SecondError
+			{
+			}
+		}
+
+		[TsFromCsName("B")]
+		public class A
+		{
 		}
 	}
 }

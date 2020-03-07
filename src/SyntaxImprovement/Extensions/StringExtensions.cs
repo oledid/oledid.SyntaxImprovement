@@ -84,32 +84,44 @@ namespace oledid.SyntaxImprovement
 		[Pure]
 		public static string AfterFirst(this string str, char matchChar, bool includeMatchCharInResult = false)
 		{
+			return str.AfterFirst(matchChar.ToString(), includeMatchCharInResult);
+		}
+
+		[Pure]
+		public static string AfterFirst(this string str, string matchString, bool includeMatchStringInResult = false)
+		{
 			if (str == null)
 				return string.Empty;
 
-			var index = str.IndexOf(matchChar);
+			var index = str.IndexOf(matchString);
 			if (index == -1)
 				return string.Empty;
 
-			var substring = str.Substring(index + 1);
-			return includeMatchCharInResult
-				? (matchChar + substring)
+			var substring = str.Substring(index + matchString.Length);
+			return includeMatchStringInResult
+				? (matchString + substring)
 				: substring;
 		}
 
 		[Pure]
 		public static string AfterLast(this string str, char matchChar, bool includeMatchCharInResult = false)
 		{
+			return str.AfterLast(matchChar.ToString(), includeMatchCharInResult);
+		}
+
+		[Pure]
+		public static string AfterLast(this string str, string matchString, bool includeMatchStringInResult = false)
+		{
 			if (str == null)
 				return string.Empty;
 
-			var index = str.LastIndexOf(matchChar);
+			var index = str.LastIndexOf(matchString);
 			if (index == -1)
 				return string.Empty;
 
-			var substring = str.Substring(index + 1);
-			return includeMatchCharInResult
-				? (matchChar + substring)
+			var substring = str.Substring(index + matchString.Length);
+			return includeMatchStringInResult
+				? (matchString + substring)
 				: substring;
 		}
 

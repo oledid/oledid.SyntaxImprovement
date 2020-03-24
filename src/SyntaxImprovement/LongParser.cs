@@ -1,6 +1,6 @@
-namespace oledid.SyntaxImprovement
+﻿namespace oledid.SyntaxImprovement
 {
-	public class LongParser
+	public static class LongParser
 	{
 		public static long ParseOrZero(string value)
 		{

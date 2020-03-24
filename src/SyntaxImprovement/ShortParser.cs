@@ -1,6 +1,6 @@
-namespace oledid.SyntaxImprovement
+﻿namespace oledid.SyntaxImprovement
 {
-	public class ShortParser
+	public static class ShortParser
 	{
 		public static short ParseOrZero(string value)
 		{

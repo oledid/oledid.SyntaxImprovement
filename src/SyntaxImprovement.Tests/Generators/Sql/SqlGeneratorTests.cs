@@ -25,6 +25,20 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 			}
 
 			[Fact]
+			public void It_can_select_top_1()
+			{
+				var query = new Select<Person>(top: 1).ToQuery();
+				Assert.Equal("SELECT TOP 1 [Id], [Name] FROM [Person];", query.QueryText);
+			}
+
+			[Fact]
+			public void It_can_select_top_1337()
+			{
+				var query = new Select<Person>(top: 1337).ToQuery();
+				Assert.Equal("SELECT TOP 1337 [Id], [Name] FROM [Person];", query.QueryText);
+			}
+
+			[Fact]
 			public void It_generates_correct_where_with_single_argument()
 			{
 				{

@@ -9,9 +9,11 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		private readonly TableInformation<TableType> tableInformation;
 		private Expression<Func<TableType, bool>> whereStatement;
 		private readonly List<Tuple<Expression<Func<TableType, object>>, bool>> orderByStatements;
+		private readonly int? TopOrNull = null;
 
-		public SelectManager()
+		public SelectManager(int? top)
 		{
+			TopOrNull = top;
 			tableInformation = new TableInformation<TableType>();
 			orderByStatements = new List<Tuple<Expression<Func<TableType, object>>, bool>>();
 		}
@@ -38,11 +40,14 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		private string CreateQuery(ParameterFactory parameterFactory)
 		{
 			var tableName = tableInformation.GetSchemaAndTableName();
+			var topPart = TopOrNull == null
+				? string.Empty
+				: "TOP " + TopOrNull.Value + " ";
 			var columns = tableInformation.GetColumnNames(excludeIgnoredFields: true);
 			var whereQueryPart = WhereGenerator.CreateQuery(parameterFactory, whereStatement);
 			var orderByQueryPart = OrderByGenerator.CreateQuery(orderByStatements);
 			return
-				  "SELECT " + string.Join(", ", columns)
+				  "SELECT " + topPart + string.Join(", ", columns)
 				+ " FROM " + tableName
 				+ whereQueryPart
 				+ orderByQueryPart + ";";

@@ -167,6 +167,7 @@ namespace oledid.SyntaxImprovement.Tests.Reflection
 				public TestModelTwo Challenge { get; set; }
 				public Guid TestValueEqualsGuid { get; set; } = Guid.Parse("9d102d39-cc11-45f2-8c72-e68afb63d09b");
 				public DateTime TestValueEqualsDateTime { get; set; } = new DateTime(2020, 5, 26, 13, 37, 00);
+				public DateTime? NullDateTime { get; set; } = null;
 			}
 
 			public class TestModelTwo

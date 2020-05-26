@@ -20,7 +20,7 @@ namespace oledid.SyntaxImprovement.Reflection
 					hasDiff = true;
 				}
 
-				if (hasDiff == false)
+				if (aValue != null && bValue != null)
 				{
 					if (property.GetMethod.ReturnType.IsValueType)
 					{

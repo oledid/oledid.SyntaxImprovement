@@ -10,10 +10,29 @@ namespace oledid.SyntaxImprovement.Reflection
 			var fieldsWithDiff = new List<PropertyWithValueDifference<TObject>>();
 			foreach (var property in typeof(TObject).GetProperties(bindingFlags))
 			{
+				var hasDiff = false;
+
 				var aValue = property.GetValue(a);
 				var bValue = property.GetValue(b);
 
-				if (aValue != bValue)
+				if ((aValue == null) != (bValue == null))
+				{
+					hasDiff = true;
+				}
+
+				if (hasDiff == false)
+				{
+					if (property.GetMethod.ReturnType.IsValueType)
+					{
+						hasDiff = hasDiff || (aValue.Equals(bValue) == false);
+					}
+					else if (aValue != bValue)
+					{
+						hasDiff = true;
+					}
+				}
+
+				if (hasDiff)
 				{
 					fieldsWithDiff.Add(new PropertyWithValueDifference<TObject>
 					{

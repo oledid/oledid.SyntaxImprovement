@@ -13,7 +13,7 @@ namespace oledid.SyntaxImprovement.Reflection
 				var aValue = property.GetValue(a);
 				var bValue = property.GetValue(b);
 
-				if (aValue.Equals(bValue))
+				if (aValue != bValue)
 				{
 					fieldsWithDiff.Add(new PropertyWithValueDifference<TObject>
 					{

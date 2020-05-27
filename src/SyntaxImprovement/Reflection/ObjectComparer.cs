@@ -22,7 +22,7 @@ namespace oledid.SyntaxImprovement.Reflection
 
 				if (aValue != null && bValue != null)
 				{
-					if (property.GetMethod.ReturnType.IsValueType)
+					if (property.GetMethod.ReturnType.IsValueType || property.GetMethod.ReturnType == typeof(string))
 					{
 						hasDiff = hasDiff || (aValue.Equals(bValue) == false);
 					}

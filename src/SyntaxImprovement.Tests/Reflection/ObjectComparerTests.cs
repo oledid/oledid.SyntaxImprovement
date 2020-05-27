@@ -1,4 +1,5 @@
-﻿using oledid.SyntaxImprovement.Reflection;
+﻿using Newtonsoft.Json;
+using oledid.SyntaxImprovement.Reflection;
 using System;
 using Xunit;
 
@@ -41,7 +42,7 @@ namespace oledid.SyntaxImprovement.Tests.Reflection
 				var b = new TestModelOne
 				{
 					Id = 2,
-					Name = "One"
+					Name = "O" + "n" + "e"
 				};
 
 				var comparison = ObjectComparer.GetParametersWithValueDifference(a, b);
@@ -158,6 +159,25 @@ namespace oledid.SyntaxImprovement.Tests.Reflection
 					Assert.Contains(comparison, item => item.Property.Name == nameof(TestModelOne.TestValueEqualsDateTime));
 					Assert.Equal(2, comparison.Count);
 				}
+			}
+
+			[Fact]
+			public void It_works_even_if_deserialized()
+			{
+				var a = new TestModelOne
+				{
+					Id = 1,
+					Name = "One"
+				};
+
+				var b = JsonConvert.DeserializeObject<TestModelOne>(@"{
+					""Id"": 2,
+					""Name"": ""One""
+				}");
+
+				var comparison = ObjectComparer.GetParametersWithValueDifference(a, b);
+				Assert.Contains(comparison, item => item.Property.Name == nameof(TestModelOne.Id));
+				Assert.Single(comparison);
 			}
 
 			public class TestModelOne

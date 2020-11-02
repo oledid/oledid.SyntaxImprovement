@@ -24,7 +24,7 @@ namespace oledid.SyntaxImprovement.Generators.TsFromCs
 		/// </summary>
 		public static string GenerateTypescriptInterfaceFromCsharpClass(IEnumerable<Type> types)
 		{
-			var typeList = types?.ToList() ?? new List<Type>();
+			var typeList = (types ?? new List<Type>()).Where(e => e.Name.StartsWith("<>") == false).ToList();
 			var ignoredTypes = typeList.Where(t => t.GetCustomAttribute<TsFromCsIgnoreAttribute>() != null).ToList();
 			typeList = typeList.Where(t => t.NotIn(ignoredTypes)).ToList();
 
@@ -44,7 +44,7 @@ namespace oledid.SyntaxImprovement.Generators.TsFromCs
 				var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
 				stringBuilder
-					.Append($"interface I{typeName} {{\r\n");
+					.Append($"export interface I{typeName} {{\r\n");
 
 				foreach (var property in properties.Where(p => p.GetCustomAttribute<TsFromCsIgnoreAttribute>() == null))
 				{

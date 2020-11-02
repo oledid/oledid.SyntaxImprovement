@@ -10,10 +10,10 @@ namespace oledid.SyntaxImprovement.Tests.Generators.TsFromCs
 		[Fact]
 		public void It_can_generate_dtos()
 		{
-			const string expected = @"interface IB {
+			const string expected = @"export interface IB {
 }
 
-interface IPersonEntity {
+export interface IPersonEntity {
 	id: number;
 	name?: string;
 	isActive: boolean;
@@ -25,7 +25,7 @@ interface IPersonEntity {
 	ignoredClass?: any;
 }
 
-interface ITypesEntity {
+export interface ITypesEntity {
 	int: number;
 	nullableInt?: number;
 	nullableBool?: boolean;

@@ -37,6 +37,9 @@ jobs:
     - name: List all *.nupkg
       run: pwsh -Command "ls *.nupkg -Recurse"
 
+    - name: Delete all *.symbols.nupkg
+      run: pwsh -Command "rm *.symbols.nupkg -Recurse"
+
     - name: Push to GitHub packages
       run: nuget push "D:\a\oledid.SyntaxImprovement\oledid.SyntaxImprovement\src\SyntaxImprovement\bin\Release\oledid.SyntaxImprovement.*.nupkg" -Source "https://nuget.pkg.github.com/oledid/index.json"
 

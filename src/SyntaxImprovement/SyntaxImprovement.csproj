@@ -5,9 +5,11 @@
 		<RootNamespace>oledid.SyntaxImprovement</RootNamespace>
 		<AssemblyName>oledid.SyntaxImprovement</AssemblyName>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
-		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 		<IncludeSymbols>true</IncludeSymbols>
-		<SymbolPackageFormat>snupkg</SymbolPackageFormat>
+		<AllowedOutputExtensionsInPackageBuildOutputFolder>$(AllowedOutputExtensionsInPackageBuildOutputFolder);.pdb</AllowedOutputExtensionsInPackageBuildOutputFolder>
+		<RepositoryUrl>https://github.com/oledid/oledid.SyntaxImprovement.git</RepositoryUrl>
+		<RepositoryType>git</RepositoryType>
+		<PublishRepositoryUrl>true</PublishRepositoryUrl>
 	</PropertyGroup>
 
 	<PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">

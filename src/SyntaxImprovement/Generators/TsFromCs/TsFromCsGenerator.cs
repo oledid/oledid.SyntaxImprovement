@@ -78,6 +78,18 @@ namespace oledid.SyntaxImprovement.Generators.TsFromCs
 
 		private static string GetTsType(Type type, IReadOnlyList<Type> knownTypes)
 		{
+			try
+			{
+				return GetTsTypeInner(type, knownTypes);
+			}
+			catch (Exception ex)
+			{
+				throw new Exception($"Could not {nameof(GetTsType)} of type {type.Namespace}.{type.Name}", ex);
+			}
+		}
+
+		private static string GetTsTypeInner(Type type, IReadOnlyList<Type> knownTypes)
+		{
 			var @switch = new Dictionary<Type, Func<string>>
 			{
 				{ typeof(bool), () => "boolean" },

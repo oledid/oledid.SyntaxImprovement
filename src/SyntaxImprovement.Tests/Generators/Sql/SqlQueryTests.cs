@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using oledid.SyntaxImprovement.Generators.Sql;
+using oledid.SyntaxImprovement.Generators.Sql.Exceptions;
 using oledid.SyntaxImprovement.Tests.Generators.Sql.TestModels;
 using Xunit;
 
@@ -34,6 +35,19 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 			Assert.Equal(new KeyValuePair<string, object>("p5", "abc123"), list[5]);
 			Assert.Equal(new KeyValuePair<string, object>("p6", null), list[6]);
 			Assert.Equal(7, list.Count);
+		}
+
+		[Fact]
+		public void It_throws_if_query_is_empty()
+		{
+			var emptyInsert = new Insert<User>();
+			Assert.False(emptyInsert.HasValue);
+			Assert.Throws<EmptyInsertQueryException>(() => emptyInsert.ToQuery());
+
+			var insertWithValue = emptyInsert.Add(new User());
+			Assert.True(insertWithValue.HasValue);
+			var doesNotThrow = insertWithValue.ToQuery();
+			Assert.NotNull(doesNotThrow);
 		}
 	}
 }

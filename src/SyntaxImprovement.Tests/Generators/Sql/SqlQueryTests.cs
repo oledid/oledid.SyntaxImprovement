@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.Linq;
 using oledid.SyntaxImprovement.Generators.Sql;
-using oledid.SyntaxImprovement.Generators.Sql.Exceptions;
 using oledid.SyntaxImprovement.Tests.Generators.Sql.TestModels;
 using Xunit;
 
@@ -38,16 +37,13 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 		}
 
 		[Fact]
-		public void It_throws_if_query_is_empty()
+		public void It_knows_if_the_query_is_empty()
 		{
 			var emptyInsert = new Insert<User>();
 			Assert.False(emptyInsert.HasValue);
-			Assert.Throws<EmptyInsertQueryException>(() => emptyInsert.ToQuery());
 
 			var insertWithValue = emptyInsert.Add(new User());
 			Assert.True(insertWithValue.HasValue);
-			var doesNotThrow = insertWithValue.ToQuery();
-			Assert.NotNull(doesNotThrow);
 		}
 	}
 }

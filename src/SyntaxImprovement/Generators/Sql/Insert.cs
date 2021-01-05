@@ -1,5 +1,4 @@
 ﻿using System.Collections.Generic;
-using oledid.SyntaxImprovement.Generators.Sql.Exceptions;
 using oledid.SyntaxImprovement.Generators.Sql.Internal;
 
 namespace oledid.SyntaxImprovement.Generators.Sql
@@ -39,17 +38,8 @@ namespace oledid.SyntaxImprovement.Generators.Sql
 			return new Insert<TableType>(list);
 		}
 
-		/// <summary>
-		/// Throws if query is empty (<see cref="HasValue"/> == false).
-		/// </summary>
-		/// <exception cref="EmptyInsertQueryException"></exception>
 		public SqlQuery ToQuery()
 		{
-			if (HasValue == false)
-			{
-				throw new EmptyInsertQueryException();
-			}
-
 			var manager = new InsertManager<TableType>();
 			return manager.ToQuery(instances);
 		}

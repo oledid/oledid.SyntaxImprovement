@@ -43,7 +43,16 @@ namespace oledid.SyntaxImprovement
 
 		public static string RemoveFromEnd(this string str, int numberOfChars)
 		{
+			if (numberOfChars > str.Length)
+			{
+				return string.Empty;
+			}
 			return str.Substring(0, Math.Max(str.Length - numberOfChars, 0));
+		}
+
+		public static string RemoveFromEnd(this string str, char character)
+		{
+			return str.RemoveFromEnd(character.ToString());
 		}
 
 		public static string RemoveFromStart(this string str, string stringToRemove)
@@ -53,6 +62,20 @@ namespace oledid.SyntaxImprovement
 			return str.StartsWith(stringToRemove)
 				? str.Substring(stringToRemove.Length)
 				: str;
+		}
+
+		public static string RemoveFromStart(this string str, char charToRemove)
+		{
+			return str.RemoveFromStart(charToRemove.ToString());
+		}
+
+		public static string RemoveFromStart(this string str, int numberOfChars)
+		{
+			if (numberOfChars > str.Length)
+			{
+				return string.Empty;
+			}
+			return str.Substring(numberOfChars);
 		}
 
 		/// <summary>

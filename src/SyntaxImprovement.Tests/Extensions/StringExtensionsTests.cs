@@ -45,5 +45,57 @@ namespace oledid.SyntaxImprovement.Tests.Extensions
 				Assert.Equal("/domain.com/page.html", text.AfterFirst('/', includeMatchCharInResult: false));
 			}
 		}
+
+		public class RemoveFromEnd
+		{
+			[Fact]
+			public void It_ignores_if_it_does_not_end_with()
+			{
+				var text = "C:\\Temp"; ;
+				Assert.Equal(text, text.RemoveFromEnd("\\"));
+				Assert.Equal(text, text.RemoveFromEnd('\\'));
+				Assert.NotEqual(text, text.RemoveFromEnd((int)'\\'));
+				Assert.Equal(text, text.RemoveFromEnd(0));
+			}
+
+			[Fact]
+			public void It_removes_specified_if_it_ends_with()
+			{
+				var text = "C:\\Temp\\"; ;
+				var expected = "C:\\Temp";
+				Assert.Equal(expected, text.RemoveFromEnd("\\"));
+				Assert.Equal(expected, text.RemoveFromEnd('\\'));
+				Assert.NotEqual(expected, text.RemoveFromEnd((int)'\\'));
+				Assert.Equal("C:\\", text.RemoveFromEnd("Temp\\"));
+				Assert.Equal(text, text.RemoveFromEnd(0));
+				Assert.Equal(expected, text.RemoveFromEnd(1));
+			}
+		}
+
+		public class RemoveFromStart
+		{
+			[Fact]
+			public void It_ignores_if_it_does_not_start_with()
+			{
+				var text = "C:\\Temp"; ;
+				Assert.Equal(text, text.RemoveFromStart("\\"));
+				Assert.Equal(text, text.RemoveFromStart('\\'));
+				Assert.NotEqual(text, text.RemoveFromStart((int)'\\'));
+				Assert.Equal(text, text.RemoveFromStart(0));
+				Assert.Equal(string.Empty, text.RemoveFromEnd(100));
+			}
+
+			[Fact]
+			public void It_removes_specified_if_it_starts_with()
+			{
+				var text = "C:\\Temp\\";
+				Assert.Equal("\\Temp\\", text.RemoveFromStart("C:"));
+				Assert.Equal(":\\Temp\\", text.RemoveFromStart('C'));
+				Assert.NotEqual(":\\Temp\\", text.RemoveFromStart((int)'C'));
+				Assert.Equal(text, text.RemoveFromStart(0));
+				Assert.Equal(":\\Temp\\", text.RemoveFromStart(1));
+				Assert.Equal(string.Empty, text.RemoveFromStart(100));
+			}
+		}
 	}
 }

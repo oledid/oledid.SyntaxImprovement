@@ -79,7 +79,12 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 
 			if (node is ConstantExpression constantExpression)
 			{
-				if (constantExpression.Value.GetType().IsClass == false || constantExpression.Value is string)
+				if (constantExpression.Value == null)
+				{
+					stringBuilder.Append("NULL");
+					return node;
+				}
+				else if (constantExpression.Value.GetType().IsClass == false || constantExpression.Value is string)
 				{
 					var value = constantExpression.Value;
 					var parameterizedValue = parameterFactory.Create(value);
@@ -131,7 +136,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 					stringBuilder.Append(')');
 				}
 
-				var operatorExpression = GetOperatorExpression(node.NodeType);
+				var operatorExpression = GetOperatorExpression(node.NodeType, binaryExpression.Left, binaryExpression.Right);
 				stringBuilder.Replace(operatorPlaceholder, operatorExpression, operatorIndex, Guid.Empty.ToString().Length + "{{}}".Length);
 
 				operatorStack.Pop();
@@ -141,12 +146,17 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			return base.Visit(node);
 		}
 
-		private static string GetOperatorExpression(ExpressionType @operator)
+		private static string GetOperatorExpression(ExpressionType @operator, Expression leftExpression, Expression rightExpression)
         {
 			switch (@operator)
 			{
 				case ExpressionType.Equal:
-					return " = ";
+				{
+					return (leftExpression is ConstantExpression left && left.Value == null)
+						|| (rightExpression is ConstantExpression right && right.Value == null)
+						? " IS "
+						: " = ";
+				}
 				case ExpressionType.NotEqual:
 					return " != ";
 				case ExpressionType.LessThan:

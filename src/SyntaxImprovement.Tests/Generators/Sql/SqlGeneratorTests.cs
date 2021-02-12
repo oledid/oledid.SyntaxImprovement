@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Linq;
 using oledid.SyntaxImprovement.Generators.Sql;
 using oledid.SyntaxImprovement.Tests.Generators.Sql.TestModels;
 using Xunit;
@@ -411,6 +412,44 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 				Assert.Equal("DELETE FROM [Person] WHERE ([Name] = @p0) OR ([Id] = @p1);", query.QueryText);
 				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
 				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+			}
+		}
+
+		public class NullTests
+		{
+			[Fact]
+			public void It_handles_NULL_in_WHERE()
+			{
+				var select = new Select<NullTest>()
+					.Where(e =>
+						e.FkId == 1
+						&& (
+							e.NullableDateTime == null
+							|| (e.NullableBool == false && e.NullableStr == null)
+							|| (e.NullableStr == "123")
+						)
+					);
+
+				var query = select.ToQuery();
+
+				var expected = $"SELECT [Id], [FkId], [NullableDateTime], [NullableBool], [NullableStr] FROM [NullTest] WHERE ([FkId] = @p0) AND ((([NullableDateTime] IS NULL) OR (([NullableBool] = @p1) AND ([NullableStr] IS NULL))) OR ([NullableStr] = @p2));";
+				Assert.Equal(expected, query.QueryText);
+				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+				Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+				Assert.Equal("123", ((IDictionary<string, object>)((dynamic)query).Parameters)["p2"]);
+				Assert.Equal(3, query.EnumerateParameters().Count());
+			}
+
+			public class NullTest : DatabaseTable
+			{
+				[IsPrimaryKey]
+				public Guid Id { get; set; }
+				public int? FkId { get; set; }
+				public DateTime? NullableDateTime { get; set; }
+				public bool? NullableBool { get; set; }
+				public string NullableStr { get; set; }
+
+				public override string GetTableName() => nameof(NullTest);
 			}
 		}
 	}

@@ -56,7 +56,7 @@ namespace oledid.SyntaxImprovement.Generators.TsFromCs
 						.Append(isNullable ? "?" : string.Empty)
 						.Append(':')
 						.Append(' ')
-						.Append(GetTsType(property.PropertyType, knownTypes: typeList))
+						.Append(GetTsType(property.PropertyType, knownTypes: typeList, parentTypeName: typeName))
 						.Append(';')
 						.Append(Environment.NewLine);
 				}
@@ -76,7 +76,7 @@ namespace oledid.SyntaxImprovement.Generators.TsFromCs
 			return overrideAttribute?.Name ?? type.Name;
 		}
 
-		private static string GetTsType(Type type, IReadOnlyList<Type> knownTypes)
+		private static string GetTsType(Type type, IReadOnlyList<Type> knownTypes, string parentTypeName)
 		{
 			try
 			{
@@ -84,7 +84,7 @@ namespace oledid.SyntaxImprovement.Generators.TsFromCs
 			}
 			catch (Exception ex)
 			{
-				throw new Exception($"Could not {nameof(GetTsType)} of type {type.Namespace}.{type.Name}", ex);
+				throw new Exception($"Could not {nameof(GetTsType)} of type {type.Namespace}.{type.Name}. Parent type: {parentTypeName}", ex);
 			}
 		}
 

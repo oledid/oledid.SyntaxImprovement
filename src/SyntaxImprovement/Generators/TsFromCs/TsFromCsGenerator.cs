@@ -80,7 +80,7 @@ namespace oledid.SyntaxImprovement.Generators.TsFromCs
 		{
 			try
 			{
-				return GetTsTypeInner(type, knownTypes);
+				return GetTsTypeInner(type, knownTypes, parentTypeName);
 			}
 			catch (Exception ex)
 			{
@@ -88,7 +88,7 @@ namespace oledid.SyntaxImprovement.Generators.TsFromCs
 			}
 		}
 
-		private static string GetTsTypeInner(Type type, IReadOnlyList<Type> knownTypes)
+		private static string GetTsTypeInner(Type type, IReadOnlyList<Type> knownTypes, string parentTypeName)
 		{
 			var @switch = new Dictionary<Type, Func<string>>
 			{
@@ -112,26 +112,26 @@ namespace oledid.SyntaxImprovement.Generators.TsFromCs
 			if (type.IsArray)
 			{
 				var arrayType = type.GetElementType();
-				return "Array<" + GetTsType(arrayType, knownTypes) + ">";
+				return "Array<" + GetTsType(arrayType, knownTypes, parentTypeName) + ">";
 			}
 
 			if (type.GetInterfaces().Any(@interface => @interface.IsGenericType && @interface.GetGenericTypeDefinition() == typeof(IDictionary<,>)))
 			{
 				var argTypes = type.GetGenericArguments();
-				var keyType = GetTsType(argTypes[0], knownTypes);
-				var valueType = GetTsType(argTypes[1], knownTypes);
+				var keyType = GetTsType(argTypes[0], knownTypes, parentTypeName);
+				var valueType = GetTsType(argTypes[1], knownTypes, parentTypeName);
 				return $"{{ [key: {keyType}]: {valueType} }}";
 			}
 
 			if (typeof(System.Collections.IEnumerable).IsAssignableFrom(type))
 			{
 				var collectionType = type.GetGenericArguments()[0];
-				return "Array<" + GetTsType(collectionType, knownTypes) + ">";
+				return "Array<" + GetTsType(collectionType, knownTypes, parentTypeName) + ">";
 			}
 
 			if (Nullable.GetUnderlyingType(type) != null)
 			{
-				return GetTsType(Nullable.GetUnderlyingType(type), knownTypes);
+				return GetTsType(Nullable.GetUnderlyingType(type), knownTypes, parentTypeName);
 			}
 
 			if (type.IsEnum)
@@ -144,7 +144,7 @@ namespace oledid.SyntaxImprovement.Generators.TsFromCs
 				return "I" + type.Name;
 			}
 
-			return tsType ?? "any";
+			return "any";
 		}
 	}
 }

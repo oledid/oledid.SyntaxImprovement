@@ -158,7 +158,12 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 						: " = ";
 				}
 				case ExpressionType.NotEqual:
-					return " != ";
+				{
+					return (leftExpression is ConstantExpression left && left.Value == null)
+						|| (rightExpression is ConstantExpression right && right.Value == null)
+							? " IS NOT "
+							: " != ";
+				}
 				case ExpressionType.LessThan:
 					return " < ";
 				case ExpressionType.LessThanOrEqual:

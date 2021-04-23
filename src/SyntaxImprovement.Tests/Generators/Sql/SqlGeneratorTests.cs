@@ -440,6 +440,29 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 				Assert.Equal(3, query.EnumerateParameters().Count());
 			}
 
+			[Fact]
+			public void It_handles_NOT_NULL_in_WHERE()
+			{
+				var select = new Select<NullTest>()
+					.Where(e =>
+						e.FkId == 1
+						&& (
+							e.NullableDateTime != null
+							|| (e.NullableBool == false && e.NullableStr == null)
+							|| (e.NullableStr == "123")
+						)
+					);
+
+				var query = select.ToQuery();
+
+				var expected = $"SELECT [Id], [FkId], [NullableDateTime], [NullableBool], [NullableStr] FROM [NullTest] WHERE ([FkId] = @p0) AND ((([NullableDateTime] IS NOT NULL) OR (([NullableBool] = @p1) AND ([NullableStr] IS NULL))) OR ([NullableStr] = @p2));";
+				Assert.Equal(expected, query.QueryText);
+				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+				Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+				Assert.Equal("123", ((IDictionary<string, object>)((dynamic)query).Parameters)["p2"]);
+				Assert.Equal(3, query.EnumerateParameters().Count());
+			}
+
 			public class NullTest : DatabaseTable
 			{
 				[IsPrimaryKey]

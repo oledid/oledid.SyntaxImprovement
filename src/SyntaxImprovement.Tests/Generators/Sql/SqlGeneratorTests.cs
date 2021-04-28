@@ -26,6 +26,13 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 			}
 
 			[Fact]
+			public void It_generates_correct_sql_with_computed_field()
+			{
+				var query = new Select<PersonWithComputedField>().ToQuery();
+				Assert.Equal("SELECT [Id], [Name], [CreatedUtc] FROM [Person];", query.QueryText);
+			}
+
+			[Fact]
 			public void It_can_select_top_1()
 			{
 				var query = new Select<Person>(top: 1).ToQuery();
@@ -212,6 +219,19 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 				Assert.Equal("UPDATE [Person] SET [Name] = @p1 WHERE [Id] = @p0", query.QueryText);
 				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
 				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+			}
+
+			[Fact]
+			public void It_throws_if_computed_fields_are_explicitly_set()
+			{
+				var utcNow = DateTime.UtcNow;
+
+				var query = new Update<PersonWithComputedField>()
+					.Set(person => person.Name, "Peter")
+					.Set(person => person.CreatedUtc, utcNow)
+					.Where(person => person.Id == 1);
+
+				Assert.Throws<ComputedFieldExplicitlySetInUpdateException>(() => query.ToQuery());
 			}
 
 			[Fact]

@@ -27,5 +27,12 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			visitor.Visit(ColumnExpression);
 			return visitor.GetColumnName();
 		}
+
+		public bool IsComputedField()
+		{
+			var visitor = new ColumnExpressionVisitor<TableType>();
+			visitor.Visit(ColumnExpression);
+			return visitor.IsComputedField();
+		}
 	}
 }

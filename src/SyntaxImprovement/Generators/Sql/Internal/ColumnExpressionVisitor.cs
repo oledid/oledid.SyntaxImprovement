@@ -23,5 +23,10 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 				throw new NotSupportedException("Could not find valid column from Update.Set-expression");
 			return "[" + memberInfo.Name + "]";
 		}
+
+		public bool IsComputedField()
+		{
+			return memberInfo?.GetCustomAttribute<IsComputedAttribute>() != null;
+		}
 	}
 }

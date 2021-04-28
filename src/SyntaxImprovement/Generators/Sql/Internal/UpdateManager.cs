@@ -61,7 +61,12 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 				{
 					expressions.RemoveAt(existingIndex);
 				}
-				expressions.Add(setExpression.GetColumnName() + " = " + parameterFactory.Create(setExpression.Value));
+				var columnName = setExpression.GetColumnName();
+				if (setExpression.IsComputedField())
+				{
+					throw new ComputedFieldExplicitlySetInUpdateException("Cannot update field with IsComputedAttribute: " + columnName);
+				}
+				expressions.Add(columnName + " = " + parameterFactory.Create(setExpression.Value));
 			}
 
 			return string.Join(", ", expressions);

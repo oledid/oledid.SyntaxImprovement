@@ -1,0 +1,92 @@
+﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Reflection;
+
+namespace oledid.SyntaxImprovement.Generators.Sqlite.Internal
+{
+	internal class SqliteTableInformation<TableType> where TableType : SqliteDatabaseTable, new()
+	{
+		private string tableName;
+		private string schemaName;
+
+		public SqliteTableInformation()
+		{
+		}
+
+		public string GetSchemaAndTableName()
+		{
+			if (tableName == null)
+			{
+				var instance = new TableType();
+				tableName = instance.GetTableName();
+				schemaName = instance.GetSchemaName();
+			}
+
+			var schemaValue = schemaName.HasValue()
+				? "[" + schemaName + "]."
+				: string.Empty;
+
+			return schemaValue + "[" + tableName + "]";
+		}
+
+		public List<string> GetColumnNames(bool excludeIdentityColumns = false, bool excludeComputedFields = false, bool excludeIgnoredFields = false)
+		{
+			var columns = GetColumns(excludeIdentityColumns, excludeComputedFields, excludeIgnoredFields);
+
+			var result = new List<string>();
+			foreach (var column in columns)
+			{
+				var name = "[" + column.Name + "]";
+				result.Add(name);
+			}
+
+			return result;
+		}
+
+		public string GetColumnName(MemberInfo memberInfo)
+		{
+			var column = GetColumn(memberInfo);
+			return "[" + column.Name + "]";
+		}
+
+		public PropertyInfo GetColumn(MemberInfo memberInfo)
+		{
+			var columns = GetColumns();
+			var column = columns.SingleOrDefault(propertyInfo => propertyInfo == memberInfo);
+			if (column == null)
+				throw new NotSupportedException("Could not find correct column.");
+			return column;
+		}
+
+		public List<object> GetColumnValues(SqliteDatabaseTable instance, bool excludeIdentityColumns = false, bool excludeComputedFields = false, bool excludeIgnoredFields = false)
+		{
+			var columns = GetColumns(excludeIdentityColumns, excludeComputedFields, excludeIgnoredFields);
+
+			var result = new List<object>();
+			foreach (var column in columns)
+			{
+				var value = column.GetValue(instance);
+				result.Add(value);
+			}
+
+			return result;
+		}
+
+		public IEnumerable<PropertyInfo> GetColumns(bool excludeIdentityColumns = false, bool excludeComputedFields = false, bool excludeIgnoredFields = false)
+		{
+			return typeof(TableType).GetProperties(BindingFlags.Public | BindingFlags.Instance)
+				.Where(column =>
+					(excludeIdentityColumns == false || Attribute.IsDefined(column, typeof(SqliteIsIdentityAttribute)) == false)
+					&& (excludeComputedFields == false || Attribute.IsDefined(column, typeof(SqliteIsComputedAttribute)) == false)
+					&& (excludeIgnoredFields == false || Attribute.IsDefined(column, typeof(SqliteIgnoreAttribute)) == false)
+				)
+				.ToList();
+		}
+
+		public PropertyInfo GetIdentityColumn()
+		{
+			return GetColumns().SingleOrDefault(column => Attribute.IsDefined(column, typeof(SqliteIsIdentityAttribute)));
+		}
+	}
+}

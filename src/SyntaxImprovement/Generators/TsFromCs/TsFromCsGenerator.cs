@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Threading.Tasks;
 
 namespace oledid.SyntaxImprovement.Generators.TsFromCs
 {
@@ -41,10 +42,45 @@ namespace oledid.SyntaxImprovement.Generators.TsFromCs
 			{
 				var isLastItem = ++index == typeList.Count;
 				var typeName = GetTsName(type);
+				if (typeName[0] == 'I' && typeName.Length > 2 && typeName[1].IsUppercaseLetterAtoZ() && typeName[2].IsLowercaseLetterAtoZ())
+				{
+					typeName = typeName.Substring(1);
+				}
 				var properties = type.GetProperties(BindingFlags.Public | BindingFlags.Instance);
 
 				stringBuilder
 					.Append($"export interface I{typeName} {{\r\n");
+
+				if (type.IsInterface)
+				{
+					foreach (var method in type.GetMethods())
+					{
+						stringBuilder
+							.Append("\t")
+							.Append(method.Name)
+							.Append("(");
+
+						var methodParams = method.GetParameters();
+						for (var i = 0; i < methodParams.Length; i++)
+						{
+							var mParam = methodParams[i];
+							var isLast = i == methodParams.Length - 1;
+							stringBuilder
+								.Append(mParam.Name)
+								.Append(":")
+								.Append(" ")
+								.Append(GetTsType(mParam.ParameterType, knownTypes: typeList, parentTypeName: typeName))
+								.Append(isLast ? string.Empty :", ");
+						}
+
+						stringBuilder.Append(")")
+							.Append(":")
+							.Append(" ")
+							.Append(GetTsType(method.ReturnType, knownTypes: typeList, parentTypeName: typeName))
+							.Append(";")
+							.Append(Environment.NewLine);
+					}
+				}
 
 				foreach (var property in properties.Where(p => p.GetCustomAttribute<TsFromCsIgnoreAttribute>() == null))
 				{
@@ -101,6 +137,8 @@ namespace oledid.SyntaxImprovement.Generators.TsFromCs
 				{ typeof(long), () => "number" },
 				{ typeof(decimal), () => "number" },
 				{ typeof(DateTime), () => "Date" },
+				{ typeof(void), () => "void" },
+				{ typeof(Task), () => "Promise<void>" }
 			};
 
 			var tsType = @switch.GetValueOrNull(type)?.Invoke();

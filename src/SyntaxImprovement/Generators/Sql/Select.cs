@@ -10,7 +10,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql
 	/// <typeparam name="TableType">A class which inherits from <see cref="DatabaseTable"/></typeparam>
 	public class Select<TableType> : SelectBase<TableType> where TableType : DatabaseTable, new()
 	{
-		public Select(int? top = null) : base(new SelectManager<TableType>(top))
+		public Select(int? top = null, IncludeFields<TableType> includeFields = null) : base(new SelectManager<TableType>(top, includeFields))
 		{
 		}
 

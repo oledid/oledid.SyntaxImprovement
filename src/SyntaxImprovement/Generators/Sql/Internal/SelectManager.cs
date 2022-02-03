@@ -9,11 +9,13 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		private readonly TableInformation<TableType> tableInformation;
 		private Expression<Func<TableType, bool>> whereStatement;
 		private readonly List<Tuple<Expression<Func<TableType, object>>, bool>> orderByStatements;
-		private readonly int? TopOrNull = null;
+		private readonly int? TopOrNull;
+		private readonly IncludeFields<TableType> FieldsToInclude;
 
-		public SelectManager(int? top)
+		public SelectManager(int? top, IncludeFields<TableType> fieldsToInclude)
 		{
 			TopOrNull = top;
+			FieldsToInclude = fieldsToInclude;
 			tableInformation = new TableInformation<TableType>();
 			orderByStatements = new List<Tuple<Expression<Func<TableType, object>>, bool>>();
 		}
@@ -43,7 +45,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			var topPart = TopOrNull == null
 				? string.Empty
 				: "TOP " + TopOrNull.Value + " ";
-			var columns = tableInformation.GetColumnNames(excludeIgnoredFields: true);
+			var columns = tableInformation.GetColumnNames(excludeIgnoredFields: true, fieldsToInclude: FieldsToInclude);
 			var whereQueryPart = WhereGenerator.CreateQuery(parameterFactory, whereStatement);
 			var orderByQueryPart = OrderByGenerator.CreateQuery(orderByStatements);
 			return

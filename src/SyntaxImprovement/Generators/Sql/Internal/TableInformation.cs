@@ -30,13 +30,22 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			return schemaValue + "[" + tableName + "]";
 		}
 
-		public List<string> GetColumnNames(bool excludeIdentityColumns = false, bool excludeComputedFields = false, bool excludeIgnoredFields = false)
+		public List<string> GetColumnNames(bool excludeIdentityColumns = false, bool excludeComputedFields = false, bool excludeIgnoredFields = false, IncludeFields<TableType> fieldsToInclude = null)
 		{
 			var columns = GetColumns(excludeIdentityColumns, excludeComputedFields, excludeIgnoredFields);
+
+			var columnNamesToInclude = fieldsToInclude == null
+				? new HashSet<string>()
+				: fieldsToInclude.GetFieldNames();
 
 			var result = new List<string>();
 			foreach (var column in columns)
 			{
+				if (fieldsToInclude != null && columnNamesToInclude.Contains(column.Name) == false)
+				{
+					continue;
+				}
+
 				var name = "[" + column.Name + "]";
 				result.Add(name);
 			}

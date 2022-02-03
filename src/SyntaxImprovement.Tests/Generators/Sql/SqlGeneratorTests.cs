@@ -204,6 +204,51 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 				Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
 				Assert.Equal(1001L, ((IDictionary<string, object>)((dynamic)query).Parameters)["p2"]);
 			}
+
+			// todo: not implemented yet
+			//[Fact]
+			//public void It_understands_boolean_true()
+			//{
+			//	var query = new Select<BooleanTestModel>()
+			//		.Where(e => e.IsActive)
+			//		.ToQuery();
+			//	Assert.Equal("SELECT [IdStr], [IsActive] FROM [BooleanTestModel] WHERE [IsActive] = @p0;", query.QueryText);
+			//	Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+			//}
+
+			[Fact]
+			public void It_understands_boolean_false()
+			{
+				var query = new Select<BooleanTestModel>()
+					.Where(e => e.IsActive == false)
+					.ToQuery();
+				Assert.Equal("SELECT [IdStr], [IsActive] FROM [BooleanTestModel] WHERE [IsActive] = @p0;", query.QueryText);
+				Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+			}
+
+			// todo: not implemented yet
+			//[Fact]
+			//public void It_understands_boolean_negate()
+			//{
+			//	var query = new Select<BooleanTestModel>()
+			//		.Where(e => !e.IsActive)
+			//		.ToQuery();
+			//	Assert.Equal("SELECT [IdStr], [IsActive] FROM [BooleanTestModel] WHERE [IsActive] = 0;", query.QueryText);
+			//	Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+			//}
+
+			[Fact]
+			public void It_understands_include_fields()
+			{
+				var query1 = new Select<BooleanTestModel>(includeFields: new IncludeFields<BooleanTestModel>(e => e.IdStr)).ToQuery();
+				Assert.Equal("SELECT [IdStr] FROM [BooleanTestModel];", query1.QueryText);
+
+				var query2 = new Select<BooleanTestModel>(includeFields: new IncludeFields<BooleanTestModel>(e => e.IsActive)).ToQuery();
+				Assert.Equal("SELECT [IsActive] FROM [BooleanTestModel];", query2.QueryText);
+
+				var query3 = new Select<BooleanTestModel>(includeFields: new IncludeFields<BooleanTestModel>(e => e.IdStr, e => e.IsActive)).ToQuery();
+				Assert.Equal("SELECT [IdStr], [IsActive] FROM [BooleanTestModel];", query3.QueryText);
+			}
 		}
 
 		public class UpdateTests

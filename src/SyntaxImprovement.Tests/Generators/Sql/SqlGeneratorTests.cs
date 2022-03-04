@@ -267,6 +267,24 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 			}
 
 			[Fact]
+			public void It_generates_correct_update_IN()
+			{
+				var names = new List<string> { "Per", "Pål", "Espen" };
+
+				var query = new Update<Person>()
+					.Set(person => person.Name, "Peter")
+					.Where(person => names.Contains(person.Name) && person.Id == 1)
+					.ToQuery();
+
+				Assert.Equal("UPDATE [Person] SET [Name] = @p4 WHERE ([Name] IN (@p0, @p1, @p2)) AND ([Id] = @p3)", query.QueryText);
+				Assert.Equal("Per", ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+				Assert.Equal("Pål", ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+				Assert.Equal("Espen", ((IDictionary<string, object>)((dynamic)query).Parameters)["p2"]);
+				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["p3"]);
+				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["p4"]);
+			}
+
+			[Fact]
 			public void It_throws_if_computed_fields_are_explicitly_set()
 			{
 				var utcNow = DateTime.UtcNow;

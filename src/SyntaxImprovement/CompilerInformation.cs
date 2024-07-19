@@ -38,7 +38,8 @@ namespace oledid.SyntaxImprovement
 		private static string FastHashKey(string key)
 		{
 			const string salt = "SR\"[fG4:%i[eHnMiW,/\\ZRz7]5[+N@5i@JjQU>-K&#{+FU}Ah}wGs-iN\\mwA=Mma";
-			return HashGenerator<MD5CryptoServiceProvider>.GetHashFromString(salt + key);
+			using var algo = MD5.Create();
+			return HashHelper.GetHashFromString(algo, salt + key);
 		}
 
 		public static string GetCallerSourceFilePath([CallerFilePath] string sourceFilePath = "")

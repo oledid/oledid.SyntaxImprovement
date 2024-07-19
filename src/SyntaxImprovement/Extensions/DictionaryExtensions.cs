@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace oledid.SyntaxImprovement
+namespace oledid.SyntaxImprovement.Extensions
 {
 	public static class DictionaryExtensions
 	{
@@ -26,7 +26,7 @@ namespace oledid.SyntaxImprovement
 				return null;
 
 			return dic.ContainsKey(key) == false
-				? (TResult?)null
+				? null
 				: dic[key];
 		}
 

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.IO;
 
-namespace oledid.SyntaxImprovement
+namespace oledid.SyntaxImprovement.Extensions
 {
 	public static class DirectoryInfoExtensions
 	{

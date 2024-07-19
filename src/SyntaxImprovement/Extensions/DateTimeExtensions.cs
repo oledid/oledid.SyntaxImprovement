@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
 
-namespace oledid.SyntaxImprovement
+namespace oledid.SyntaxImprovement.Extensions
 {
 	public static class DateTimeExtensions
 	{

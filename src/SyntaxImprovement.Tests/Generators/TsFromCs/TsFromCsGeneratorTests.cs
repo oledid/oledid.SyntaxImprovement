@@ -8,6 +8,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.TsFromCs
 	public class TsFromCsGeneratorTests
 	{
 		[Fact]
+		[Obsolete]
 		public void It_can_generate_dtos()
 		{
 			const string expected = @"export interface IB {

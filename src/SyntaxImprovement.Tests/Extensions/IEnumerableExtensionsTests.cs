@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using oledid.SyntaxImprovement.Extensions;
+using System.Collections.Generic;
 using Xunit;
 
 namespace oledid.SyntaxImprovement.Tests.Extensions

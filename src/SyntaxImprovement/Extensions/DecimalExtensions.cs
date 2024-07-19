@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace oledid.SyntaxImprovement
+namespace oledid.SyntaxImprovement.Extensions
 {
 	public static class DecimalExtensions
 	{

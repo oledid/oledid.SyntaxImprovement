@@ -1,4 +1,5 @@
-﻿using System;
+﻿using oledid.SyntaxImprovement.Extensions;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -7,6 +8,7 @@ using System.Threading.Tasks;
 
 namespace oledid.SyntaxImprovement.Generators.TsFromCs
 {
+	[Obsolete("NSwag is much better.")]
 	public class TsFromCsGenerator
 	{
 		/// <summary>

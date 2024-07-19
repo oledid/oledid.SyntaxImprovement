@@ -4,6 +4,7 @@ using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text.RegularExpressions;
 using System.Collections;
+using oledid.SyntaxImprovement.Extensions;
 
 namespace oledid.SyntaxImprovement.CodeTests
 {

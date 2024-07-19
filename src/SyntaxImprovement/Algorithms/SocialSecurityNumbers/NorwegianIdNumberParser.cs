@@ -1,4 +1,5 @@
-﻿using System;
+﻿using oledid.SyntaxImprovement.Extensions;
+using System;
 using System.Linq;
 
 namespace oledid.SyntaxImprovement.Algorithms.SocialSecurityNumbers

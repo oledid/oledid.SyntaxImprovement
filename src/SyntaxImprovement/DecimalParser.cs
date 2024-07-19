@@ -1,4 +1,5 @@
-﻿using System.Globalization;
+﻿using oledid.SyntaxImprovement.Extensions;
+using System.Globalization;
 
 namespace oledid.SyntaxImprovement
 {

@@ -1,5 +1,5 @@
-﻿using System;
-using oledid.SyntaxImprovement.Generators.Sql;
+﻿using oledid.SyntaxImprovement.Generators.Db;
+using System;
 
 namespace oledid.SyntaxImprovement.Tests.Generators.Sql.TestModels
 {

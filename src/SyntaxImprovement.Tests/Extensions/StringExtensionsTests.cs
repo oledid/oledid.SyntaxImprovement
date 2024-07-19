@@ -1,4 +1,5 @@
-﻿using Xunit;
+﻿using oledid.SyntaxImprovement.Extensions;
+using Xunit;
 
 namespace oledid.SyntaxImprovement.Tests.Extensions
 {

@@ -13,7 +13,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		private readonly StringBuilder stringBuilder;
 		private readonly Stack<ExpressionType> operatorStack;
 
-		private bool IsInsideBinaryOrUnaryExpression = false;
+		private bool IsSingleExpression = true;
 
 		internal WhereExpressionVisitor(ParameterFactory parameterFactory)
 		{
@@ -22,26 +22,26 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			operatorStack = new Stack<ExpressionType>();
 		}
 
-		public override Expression Visit(Expression node)
+		protected override Expression VisitMethodCall(MethodCallExpression node)
 		{
-			if (node is MethodCallExpression methodCallExpression && methodCallExpression.Method.Name == "Contains")
+			if (node.Method.Name == "Contains")
 			{
 				var argumentVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory());
-				argumentVisitor.IsInsideBinaryOrUnaryExpression = true;
-				argumentVisitor.Visit(methodCallExpression.Arguments);
+				argumentVisitor.IsSingleExpression = false;
+				argumentVisitor.Visit(node.Arguments);
 
 				var callVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory());
-				callVisitor.IsInsideBinaryOrUnaryExpression = true;
-				callVisitor.Visit(methodCallExpression.Object);
+				callVisitor.IsSingleExpression = false;
+				callVisitor.Visit(node.Object);
 
-				if (methodCallExpression.Method.DeclaringType == typeof(string))
+				if (node.Method.DeclaringType == typeof(string))
 				{
 					stringBuilder.Append(callVisitor.stringBuilder);
 					stringBuilder.Append(" LIKE ");
 					stringBuilder.Append(parameterFactory.Create("%" + argumentVisitor.parameterFactory.parameters.Single().Value + "%"));
 					return node;
 				}
-				else if (methodCallExpression.Method.DeclaringType.IsGenericType && typeof(IEnumerable).IsAssignableFrom(methodCallExpression.Method.DeclaringType))
+				else if (node.Method.DeclaringType.IsGenericType && typeof(IEnumerable).IsAssignableFrom(node.Method.DeclaringType))
 				{
 					stringBuilder.Append(argumentVisitor.stringBuilder);
 					stringBuilder.Append(" IN ");
@@ -63,12 +63,17 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 				}
 			}
 
-			if (node is MemberExpression memberExpression && memberExpression.Expression.Type == typeof(TableType) && memberExpression.Expression.NodeType == ExpressionType.Parameter)
+			return base.VisitMethodCall(node);
+		}
+
+		protected override Expression VisitMember(MemberExpression node)
+		{
+			if (node.Expression.Type == typeof(TableType) && node.Expression.NodeType == ExpressionType.Parameter)
 			{
-				var columnExpression = "[" + memberExpression.Member.Name + "]";
+				var columnExpression = "[" + node.Member.Name + "]";
 				stringBuilder.Append(columnExpression);
 
-				if (IsInsideBinaryOrUnaryExpression)
+				if (IsSingleExpression == false)
 				{
 					return node;
 				}
@@ -78,109 +83,109 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 				return node;
 			}
 
-			if (node is MemberExpression m)
+			var objectMember = Expression.Convert(node, typeof(object));
+			var getterLambda = Expression.Lambda<Func<object>>(objectMember);
+			var getter = getterLambda.Compile();
+			var value = getter.Invoke();
+			var parameterizedValue = parameterFactory.Create(value);
+			stringBuilder.Append(parameterizedValue);
+
+			return node;
+		}
+
+		protected override Expression VisitConstant(ConstantExpression node)
+		{
+			if (node.Value == null)
 			{
-				var objectMember = Expression.Convert(m, typeof(object));
-				var getterLambda = Expression.Lambda<Func<object>>(objectMember);
-				var getter = getterLambda.Compile();
-				var value = getter.Invoke();
+				stringBuilder.Append("NULL");
+				return node;
+			}
+			else if (node.Value.GetType().IsClass == false || node.Value is string)
+			{
+				var value = node.Value;
 				var parameterizedValue = parameterFactory.Create(value);
 				stringBuilder.Append(parameterizedValue);
 				return node;
 			}
-
-			if (node is ConstantExpression constantExpression)
+			else
 			{
-				if (constantExpression.Value == null)
+				var fields = node.Value.GetType().GetFields();
+				if (fields.Length != 1)
 				{
-					stringBuilder.Append("NULL");
-					return node;
+					throw new NotSupportedException();
 				}
-				else if (constantExpression.Value.GetType().IsClass == false || constantExpression.Value is string)
-				{
-					var value = constantExpression.Value;
-					var parameterizedValue = parameterFactory.Create(value);
-					stringBuilder.Append(parameterizedValue);
-					return node;
-				}
-				else
-				{
-					var fields = constantExpression.Value.GetType().GetFields();
-					if (fields.Length != 1)
-					{
-						throw new NotSupportedException();
-					}
-					var field = fields.Single();
-					var value = field.GetValue(constantExpression.Value);
-					var parameterizedValue = parameterFactory.Create(value);
-					stringBuilder.Append(parameterizedValue);
-					return node;
-				}
+				var field = fields.Single();
+				var value = field.GetValue(node.Value);
+				var parameterizedValue = parameterFactory.Create(value);
+				stringBuilder.Append(parameterizedValue);
+				return node;
+			}
+		}
+
+		protected override Expression VisitBinary(BinaryExpression binaryExpression)
+		{
+			IsSingleExpression = false;
+
+			var addParantheses = binaryExpression.NodeType.In(ExpressionType.AndAlso, ExpressionType.OrElse);
+
+			operatorStack.Push(binaryExpression.NodeType);
+
+			if (addParantheses)
+			{
+				stringBuilder.Append('(');
+			}
+			Visit(binaryExpression.Left);
+			if (addParantheses)
+			{
+				stringBuilder.Append(')');
 			}
 
-			if (node is BinaryExpression binaryExpression)
+			var operatorIndex = stringBuilder.Length;
+			var operatorPlaceholder = "{{" + Guid.NewGuid() + "}}";
+			stringBuilder.Append(operatorPlaceholder);
+
+			if (addParantheses)
 			{
-				IsInsideBinaryOrUnaryExpression = true;
+				stringBuilder.Append('(');
+			}
+			Visit(binaryExpression.Right);
+			if (addParantheses)
+			{
+				stringBuilder.Append(')');
+			}
 
-				var addParantheses = binaryExpression.NodeType.In(ExpressionType.AndAlso, ExpressionType.OrElse);
+			var operatorExpression = GetOperatorExpression(binaryExpression.NodeType, binaryExpression.Left, binaryExpression.Right);
+			stringBuilder.Replace(operatorPlaceholder, operatorExpression, operatorIndex, Guid.Empty.ToString().Length + "{{}}".Length);
 
-				operatorStack.Push(node.NodeType);
+			operatorStack.Pop();
 
-				if (addParantheses)
-				{
-					stringBuilder.Append('(');
-				}
-				Visit(binaryExpression.Left);
-				if (addParantheses)
-				{
-					stringBuilder.Append(')');
-				}
+			IsSingleExpression = true;
+			return binaryExpression;
+		}
 
-				var operatorIndex = stringBuilder.Length;
-				var operatorPlaceholder = "{{" + Guid.NewGuid() + "}}";
-				stringBuilder.Append(operatorPlaceholder);
+		protected override Expression VisitLambda<T>(Expression<T> node)
+		{
+			var callVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory());
+			callVisitor.Visit(node.Body);
 
-				if (addParantheses)
-				{
-					stringBuilder.Append('(');
-				}
-				Visit(binaryExpression.Right);
-				if (addParantheses)
-				{
-					stringBuilder.Append(')');
-				}
+			return base.VisitLambda(node);
+		}
 
-				var operatorExpression = GetOperatorExpression(node.NodeType, binaryExpression.Left, binaryExpression.Right);
-				stringBuilder.Replace(operatorPlaceholder, operatorExpression, operatorIndex, Guid.Empty.ToString().Length + "{{}}".Length);
+		protected override Expression VisitUnary(UnaryExpression node)
+		{
+			if (node.NodeType == ExpressionType.Not)
+			{
+				var operandVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory());
+				operandVisitor.IsSingleExpression = false;
+				operandVisitor.Visit(node.Operand);
 
-				operatorStack.Pop();
-
-				IsInsideBinaryOrUnaryExpression = false;
+				stringBuilder.Append(operandVisitor.stringBuilder.ToString());
+				stringBuilder.Append(" IS NOT DISTINCT FROM ");
+				stringBuilder.Append(parameterFactory.Create(false));
 				return node;
 			}
 
-			if (node is LambdaExpression lambdaExpression)
-			{
-				var callVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory());
-				callVisitor.Visit(lambdaExpression.Body);
-			}
-
-			if (node is UnaryExpression unaryExpression)
-			{
-				if (unaryExpression.NodeType == ExpressionType.Not)
-				{
-					var operandVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory());
-					operandVisitor.IsInsideBinaryOrUnaryExpression = true;
-					operandVisitor.Visit(unaryExpression.Operand);
-
-					stringBuilder.Append(operandVisitor.stringBuilder.ToString());
-					stringBuilder.Append(" IS NOT DISTINCT FROM ");
-					stringBuilder.Append(parameterFactory.Create(false));
-					return node;
-				}
-			}
-
-			return base.Visit(node);
+			return base.VisitUnary(node);
 		}
 
 		private static string GetOperatorExpression(ExpressionType @operator, Expression leftExpression, Expression rightExpression)

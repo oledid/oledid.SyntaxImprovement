@@ -1,4 +1,4 @@
-﻿namespace oledid.SyntaxImprovement.Generators.Db
+﻿namespace oledid.SyntaxImprovement.Generators.Sql
 {
 	public abstract class DatabaseTable
 	{

@@ -4,7 +4,7 @@ using System.Linq;
 using System.Linq.Expressions;
 using oledid.SyntaxImprovement.Extensions;
 
-namespace oledid.SyntaxImprovement.Generators.Db;
+namespace oledid.SyntaxImprovement.Generators.Sql;
 
 public class IncludeFields<TableType> where TableType : DatabaseTable, new()
 {

@@ -1,4 +1,6 @@
-﻿/*
+﻿#pragma warning disable SYSLIB0021 // Derived cryptographic types are obsolete
+#pragma warning disable SYSLIB0041 // Some Rfc2898DeriveBytes constructors are obsolete
+/*
  * This work (Modern Encryption of a String C#, by James Tuley), 
  * identified by James Tuley, is free of known copyright restrictions.
  * https://gist.github.com/4336842
@@ -405,3 +407,5 @@ namespace oledid.SyntaxImprovement.Tests.Algorithms.Deprecated
 
 	}
 }
+#pragma warning restore SYSLIB0021
+#pragma warning restore SYSLIB0041

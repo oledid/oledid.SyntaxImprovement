@@ -231,7 +231,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 				var query = new Select<BooleanTestModel>()
 					.Where(e => !e.IsActive)
 					.ToQuery();
-				Assert.Equal("SELECT [IdStr], [IsActive] FROM [BooleanTestModel] WHERE [IsActive] IS NOT DISTINCT FROM 0;", query.QueryText);
+				Assert.Equal("SELECT [IdStr], [IsActive] FROM [BooleanTestModel] WHERE [IsActive] IS NOT DISTINCT FROM @p0;", query.QueryText);
 				Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
 			}
 

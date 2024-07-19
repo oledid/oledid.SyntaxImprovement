@@ -13,6 +13,8 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		private readonly StringBuilder stringBuilder;
 		private readonly Stack<ExpressionType> operatorStack;
 
+		private bool IsInsideBinaryOrUnaryExpression = false;
+
 		internal WhereExpressionVisitor(ParameterFactory parameterFactory)
 		{
 			this.parameterFactory = parameterFactory;
@@ -25,9 +27,11 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			if (node is MethodCallExpression methodCallExpression && methodCallExpression.Method.Name == "Contains")
 			{
 				var argumentVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory());
+				argumentVisitor.IsInsideBinaryOrUnaryExpression = true;
 				argumentVisitor.Visit(methodCallExpression.Arguments);
 
 				var callVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory());
+				callVisitor.IsInsideBinaryOrUnaryExpression = true;
 				callVisitor.Visit(methodCallExpression.Object);
 
 				if (methodCallExpression.Method.DeclaringType == typeof(string))
@@ -63,6 +67,14 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			{
 				var columnExpression = "[" + memberExpression.Member.Name + "]";
 				stringBuilder.Append(columnExpression);
+
+				if (IsInsideBinaryOrUnaryExpression)
+				{
+					return node;
+				}
+
+				stringBuilder.Append(" IS NOT DISTINCT FROM ");
+				stringBuilder.Append(parameterFactory.Create(true));
 				return node;
 			}
 
@@ -108,6 +120,8 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 
 			if (node is BinaryExpression binaryExpression)
 			{
+				IsInsideBinaryOrUnaryExpression = true;
+
 				var addParantheses = binaryExpression.NodeType.In(ExpressionType.AndAlso, ExpressionType.OrElse);
 
 				operatorStack.Push(node.NodeType);
@@ -140,7 +154,30 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 				stringBuilder.Replace(operatorPlaceholder, operatorExpression, operatorIndex, Guid.Empty.ToString().Length + "{{}}".Length);
 
 				operatorStack.Pop();
+
+				IsInsideBinaryOrUnaryExpression = false;
 				return node;
+			}
+
+			if (node is LambdaExpression lambdaExpression)
+			{
+				var callVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory());
+				callVisitor.Visit(lambdaExpression.Body);
+			}
+
+			if (node is UnaryExpression unaryExpression)
+			{
+				if (unaryExpression.NodeType == ExpressionType.Not)
+				{
+					var operandVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory());
+					operandVisitor.IsInsideBinaryOrUnaryExpression = true;
+					operandVisitor.Visit(unaryExpression.Operand);
+
+					stringBuilder.Append(operandVisitor.stringBuilder.ToString());
+					stringBuilder.Append(" IS NOT DISTINCT FROM ");
+					stringBuilder.Append(parameterFactory.Create(false));
+					return node;
+				}
 			}
 
 			return base.Visit(node);

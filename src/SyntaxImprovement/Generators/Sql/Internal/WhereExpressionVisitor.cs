@@ -147,23 +147,17 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		}
 
 		private static string GetOperatorExpression(ExpressionType @operator, Expression leftExpression, Expression rightExpression)
-        {
+		{
 			switch (@operator)
 			{
 				case ExpressionType.Equal:
-				{
-					return (leftExpression is ConstantExpression left && left.Value == null)
-						|| (rightExpression is ConstantExpression right && right.Value == null)
-						? " IS "
-						: " = ";
-				}
+					{
+						return " IS NOT DISTINCT FROM ";
+					}
 				case ExpressionType.NotEqual:
-				{
-					return (leftExpression is ConstantExpression left && left.Value == null)
-						|| (rightExpression is ConstantExpression right && right.Value == null)
-							? " IS NOT "
-							: " != ";
-				}
+					{
+						return " IS DISTINCT FROM ";
+					}
 				case ExpressionType.LessThan:
 					return " < ";
 				case ExpressionType.LessThanOrEqual:

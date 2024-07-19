@@ -1,7 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
 	<PropertyGroup>
-		<TargetFramework>net6.0</TargetFramework>
+		<TargetFramework>net8.0</TargetFramework>
 		<RootNamespace>oledid.SyntaxImprovement</RootNamespace>
 		<AssemblyName>oledid.SyntaxImprovement</AssemblyName>
 		<GenerateAssemblyInfo>false</GenerateAssemblyInfo>
@@ -24,8 +24,8 @@
 
 	<ItemGroup>
 		<PackageReference Include="Microsoft.CSharp" Version="4.7.0" />
-		<PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="5.0.0" />
-		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="1.0.0" PrivateAssets="All" />
+		<PackageReference Include="Microsoft.Extensions.Caching.Abstractions" Version="8.0.0" />
+		<PackageReference Include="Microsoft.SourceLink.GitHub" Version="8.0.0" PrivateAssets="All" />
 	</ItemGroup>
 
 </Project>

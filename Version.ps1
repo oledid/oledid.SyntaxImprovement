@@ -1,7 +1,7 @@
 # change these:
 ###################
 $major = "0"
-$minor = "12"
+$minor = "13"
 ###################
 
 $pattern = '^\[assembly: AssemblyVersion\("(.*)"\)\]'

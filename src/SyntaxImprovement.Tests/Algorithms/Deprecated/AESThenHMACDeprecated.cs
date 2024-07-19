@@ -5,16 +5,14 @@
  * http://creativecommons.org/publicdomain/mark/1.0/ 
  */
 
-// edited by @oledid 2024-07-19
-
 using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace oledid.SyntaxImprovement.Algorithms.Cryptography
+namespace oledid.SyntaxImprovement.Tests.Algorithms.Deprecated
 {
-	public static class AESThenHMAC
+	public static class AESThenHMACDeprecated
 	{
 		private static readonly RandomNumberGenerator Random = RandomNumberGenerator.Create();
 
@@ -52,7 +50,8 @@ namespace oledid.SyntaxImprovement.Algorithms.Cryptography
 		/// <remarks>
 		/// Adds overhead of (Optional-Payload + BlockSize(16) + Message-Padded-To-Blocksize +  HMac-Tag(32)) * 1.33 Base64
 		/// </remarks>
-		public static string SimpleEncrypt(string secretMessage, byte[] cryptKey, byte[] authKey, byte[] nonSecretPayload = null)
+		public static string SimpleEncrypt(string secretMessage, byte[] cryptKey, byte[] authKey,
+										   byte[] nonSecretPayload = null)
 		{
 			if (string.IsNullOrEmpty(secretMessage))
 				throw new ArgumentException("Secret Message Required!", "secretMessage");
@@ -73,7 +72,8 @@ namespace oledid.SyntaxImprovement.Algorithms.Cryptography
 		/// Decrypted Message
 		/// </returns>
 		/// <exception cref="ArgumentException">Encrypted Message Required!;encryptedMessage</exception>
-		public static string SimpleDecrypt(string encryptedMessage, byte[] cryptKey, byte[] authKey, int nonSecretPayloadLength = 0)
+		public static string SimpleDecrypt(string encryptedMessage, byte[] cryptKey, byte[] authKey,
+										   int nonSecretPayloadLength = 0)
 		{
 			if (string.IsNullOrWhiteSpace(encryptedMessage))
 				throw new ArgumentException("Encrypted Message Required!", "encryptedMessage");
@@ -89,7 +89,6 @@ namespace oledid.SyntaxImprovement.Algorithms.Cryptography
 		/// </summary>
 		/// <param name="secretMessage">The secret message.</param>
 		/// <param name="password">The password.</param>
-		/// <param name="hashAlgorithmName">Name of the hash algorithm used to create auth key from password. Use SHA256 or better. Previous versions without the parameter used SHA1.</param>
 		/// <param name="nonSecretPayload">The non secret payload.</param>
 		/// <returns>
 		/// Encrypted Message
@@ -99,13 +98,14 @@ namespace oledid.SyntaxImprovement.Algorithms.Cryptography
 		/// Significantly less secure than using random binary keys.
 		/// Adds additional non secret payload for key generation parameters.
 		/// </remarks>
-		public static string SimpleEncryptWithPassword(string secretMessage, string password, HashAlgorithmName hashAlgorithmName, byte[] nonSecretPayload = null)
+		public static string SimpleEncryptWithPassword(string secretMessage, string password,
+													   byte[] nonSecretPayload = null)
 		{
 			if (string.IsNullOrEmpty(secretMessage))
 				throw new ArgumentException("Secret Message Required!", "secretMessage");
 
 			var plainText = Encoding.UTF8.GetBytes(secretMessage);
-			var cipherText = SimpleEncryptWithPassword(plainText, password, hashAlgorithmName, nonSecretPayload);
+			var cipherText = SimpleEncryptWithPassword(plainText, password, nonSecretPayload);
 			return Convert.ToBase64String(cipherText);
 		}
 
@@ -115,7 +115,6 @@ namespace oledid.SyntaxImprovement.Algorithms.Cryptography
 		/// </summary>
 		/// <param name="encryptedMessage">The encrypted message.</param>
 		/// <param name="password">The password.</param>
-		/// <param name="hashAlgorithmName">Name of the hash algorithm used to create auth key from password. Use SHA256 or better. Previous versions without the parameter used SHA1.</param>
 		/// <param name="nonSecretPayloadLength">Length of the non secret payload.</param>
 		/// <returns>
 		/// Decrypted Message
@@ -124,13 +123,14 @@ namespace oledid.SyntaxImprovement.Algorithms.Cryptography
 		/// <remarks>
 		/// Significantly less secure than using random binary keys.
 		/// </remarks>
-		public static string SimpleDecryptWithPassword(string encryptedMessage, string password, HashAlgorithmName hashAlgorithmName, int nonSecretPayloadLength = 0)
+		public static string SimpleDecryptWithPassword(string encryptedMessage, string password,
+													   int nonSecretPayloadLength = 0)
 		{
 			if (string.IsNullOrWhiteSpace(encryptedMessage))
 				throw new ArgumentException("Encrypted Message Required!", "encryptedMessage");
 
 			var cipherText = Convert.FromBase64String(encryptedMessage);
-			var plainText = SimpleDecryptWithPassword(cipherText, password, hashAlgorithmName, nonSecretPayloadLength);
+			var plainText = SimpleDecryptWithPassword(cipherText, password, nonSecretPayloadLength);
 			return plainText == null ? null : Encoding.UTF8.GetString(plainText);
 		}
 
@@ -165,8 +165,15 @@ namespace oledid.SyntaxImprovement.Algorithms.Cryptography
 			byte[] cipherText;
 			byte[] iv;
 
-			using (var aes = Aes.Create())
+			using (var aes = new AesManaged
 			{
+				KeySize = KeyBitSize,
+				BlockSize = BlockBitSize,
+				Mode = CipherMode.CBC,
+				Padding = PaddingMode.PKCS7
+			})
+			{
+
 				//Use random IV
 				aes.GenerateIV();
 				iv = aes.IV;
@@ -254,8 +261,15 @@ namespace oledid.SyntaxImprovement.Algorithms.Cryptography
 				if (compare != 0)
 					return null;
 
-				using (var aes = Aes.Create())
+				using (var aes = new AesManaged
 				{
+					KeySize = KeyBitSize,
+					BlockSize = BlockBitSize,
+					Mode = CipherMode.CBC,
+					Padding = PaddingMode.PKCS7
+				})
+				{
+
 					//Grab IV from message
 					var iv = new byte[ivLength];
 					Array.Copy(encryptedMessage, nonSecretPayloadLength, iv, 0, iv.Length);
@@ -286,7 +300,6 @@ namespace oledid.SyntaxImprovement.Algorithms.Cryptography
 		/// </summary>
 		/// <param name="secretMessage">The secret message.</param>
 		/// <param name="password">The password.</param>
-		/// <param name="hashAlgorithmName">Name of the hash algorithm used to create auth key from password. Use SHA256 or better. Previous versions without the parameter used SHA1.</param>
 		/// <param name="nonSecretPayload">The non secret payload.</param>
 		/// <returns>
 		/// Encrypted Message
@@ -296,7 +309,7 @@ namespace oledid.SyntaxImprovement.Algorithms.Cryptography
 		/// Significantly less secure than using random binary keys.
 		/// Adds additional non secret payload for key generation parameters.
 		/// </remarks>
-		public static byte[] SimpleEncryptWithPassword(byte[] secretMessage, string password, HashAlgorithmName hashAlgorithmName, byte[] nonSecretPayload = null)
+		public static byte[] SimpleEncryptWithPassword(byte[] secretMessage, string password, byte[] nonSecretPayload = null)
 		{
 			nonSecretPayload = nonSecretPayload ?? new byte[] { };
 
@@ -315,7 +328,7 @@ namespace oledid.SyntaxImprovement.Algorithms.Cryptography
 			byte[] cryptKey;
 			byte[] authKey;
 			//Use Random Salt to prevent pre-generated weak password attacks.
-			using (var generator = new Rfc2898DeriveBytes(password, SaltBitSize / 8, Iterations, hashAlgorithmName))
+			using (var generator = new Rfc2898DeriveBytes(password, SaltBitSize / 8, Iterations))
 			{
 				var salt = generator.Salt;
 
@@ -329,7 +342,7 @@ namespace oledid.SyntaxImprovement.Algorithms.Cryptography
 
 			//Deriving separate key, might be less efficient than using HKDF, 
 			//but now compatible with RNEncryptor which had a very similar wireformat and requires less code than HKDF.
-			using (var generator = new Rfc2898DeriveBytes(password, SaltBitSize / 8, Iterations, hashAlgorithmName))
+			using (var generator = new Rfc2898DeriveBytes(password, SaltBitSize / 8, Iterations))
 			{
 				var salt = generator.Salt;
 
@@ -349,7 +362,6 @@ namespace oledid.SyntaxImprovement.Algorithms.Cryptography
 		/// </summary>
 		/// <param name="encryptedMessage">The encrypted message.</param>
 		/// <param name="password">The password.</param>
-		/// <param name="hashAlgorithmName">Name of the hash algorithm used to create auth key from password. Use SHA256 or better. Previous versions without the parameter used SHA1.</param>
 		/// <param name="nonSecretPayloadLength">Length of the non secret payload.</param>
 		/// <returns>
 		/// Decrypted Message
@@ -358,7 +370,7 @@ namespace oledid.SyntaxImprovement.Algorithms.Cryptography
 		/// <remarks>
 		/// Significantly less secure than using random binary keys.
 		/// </remarks>
-		public static byte[] SimpleDecryptWithPassword(byte[] encryptedMessage, string password, HashAlgorithmName hashAlgorithmName, int nonSecretPayloadLength = 0)
+		public static byte[] SimpleDecryptWithPassword(byte[] encryptedMessage, string password, int nonSecretPayloadLength = 0)
 		{
 			//User Error Checks
 			if (string.IsNullOrWhiteSpace(password) || password.Length < MinPasswordLength)
@@ -378,17 +390,18 @@ namespace oledid.SyntaxImprovement.Algorithms.Cryptography
 			byte[] authKey;
 
 			//Generate crypt key
-			using (var generator = new Rfc2898DeriveBytes(password, cryptSalt, Iterations, hashAlgorithmName))
+			using (var generator = new Rfc2898DeriveBytes(password, cryptSalt, Iterations))
 			{
 				cryptKey = generator.GetBytes(KeyBitSize / 8);
 			}
 			//Generate auth key
-			using (var generator = new Rfc2898DeriveBytes(password, authSalt, Iterations, hashAlgorithmName))
+			using (var generator = new Rfc2898DeriveBytes(password, authSalt, Iterations))
 			{
 				authKey = generator.GetBytes(KeyBitSize / 8);
 			}
 
 			return SimpleDecrypt(encryptedMessage, cryptKey, authKey, cryptSalt.Length + authSalt.Length + nonSecretPayloadLength);
 		}
+
 	}
 }

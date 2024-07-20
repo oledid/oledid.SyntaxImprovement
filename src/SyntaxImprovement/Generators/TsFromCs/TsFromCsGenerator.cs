@@ -7,6 +7,7 @@ using System.Threading.Tasks;
 
 namespace oledid.SyntaxImprovement.Generators.TsFromCs
 {
+	[Obsolete("NSwag is better.")]
 	public class TsFromCsGenerator
 	{
 		/// <summary>

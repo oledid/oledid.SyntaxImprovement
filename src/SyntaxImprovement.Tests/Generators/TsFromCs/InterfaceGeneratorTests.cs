@@ -8,6 +8,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.TsFromCs
 	public class InterfaceGeneratorTests
 	{
 		[Fact]
+		[Obsolete]
 		public void It_can_generate_interfaces()
 		{
 			const string expected = @"export interface IHub {

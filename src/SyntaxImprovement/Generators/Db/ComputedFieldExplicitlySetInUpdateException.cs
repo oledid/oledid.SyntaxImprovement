@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace oledid.SyntaxImprovement.Generators.Sql
+namespace oledid.SyntaxImprovement.Generators.Db
 {
 	public class ComputedFieldExplicitlySetInUpdateException : Exception
 	{

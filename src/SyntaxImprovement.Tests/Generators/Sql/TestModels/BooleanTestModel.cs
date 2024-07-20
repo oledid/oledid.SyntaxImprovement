@@ -1,0 +1,14 @@
+﻿using oledid.SyntaxImprovement.Generators.Db;
+
+namespace oledid.SyntaxImprovement.Tests.Generators.Sql.TestModels
+{
+	public class BooleanTestModel : DatabaseTable
+	{
+		public override string GetTableName() => nameof(BooleanTestModel);
+
+		[IsPrimaryKey]
+		public string IdStr { get; set; }
+
+		public bool IsActive { get; set; }
+	}
+}

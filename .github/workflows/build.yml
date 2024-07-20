@@ -1,0 +1,48 @@
+name: Build
+on: [push]
+jobs:
+  build:
+    runs-on: windows-latest
+
+    steps:
+    - uses: actions/checkout@v2
+
+    - run: choco install nuget.commandline
+
+    - run: choco install curl
+
+    - name: Download info about the last package
+      run: 'curl --silent -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://nuget.pkg.github.com/oledid/oledid.SyntaxImprovement/index.json" > nuget-index.json'
+
+    - name: Prepare version
+      run: pwsh prepare-version.ps1 -commitish ${{ github.sha }}
+
+    - name: Setup .NET Core
+      uses: actions/setup-dotnet@v1
+      with:
+        dotnet-version: 6.x.x
+
+    - name: Build with dotnet
+      run: dotnet build --configuration Release
+
+    - name: Test with dotnet
+      run: dotnet test
+
+    - name: Pack
+      run: pwsh pack.ps1
+
+    - name: Add NuGet source
+      run: nuget source Add -Name "GitHub" -Source "https://nuget.pkg.github.com/oledid/index.json" -UserName oledid -Password ${{ secrets.GITHUB_TOKEN }}
+
+    - name: List all *.nupkg
+      run: pwsh -Command "ls *.nupkg -Recurse"
+
+    - name: Delete all *.symbols.nupkg
+      run: pwsh -Command "ls *.symbols.nupkg -Recurse | Remove-Item -Verbose"
+
+    - name: Push to GitHub packages
+      run: nuget push "D:\a\oledid.SyntaxImprovement\oledid.SyntaxImprovement\src\SyntaxImprovement\bin\Release\oledid.SyntaxImprovement.*.nupkg" -Source "https://nuget.pkg.github.com/oledid/index.json"
+
+    - name: Create release
+      run: 'curl --silent -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/x-www-form-urlencoded" -d "@release-request.json" -X POST "https://api.github.com/repos/oledid/oledid.SyntaxImprovement/releases" > curl-result.txt'
+

@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using oledid.SyntaxImprovement.Generators.Db.Sql;
+using oledid.SyntaxImprovement.Generators.Sql;
 using oledid.SyntaxImprovement.Tests.Generators.Sql.TestModels;
 using Xunit;
 

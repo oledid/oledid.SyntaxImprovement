@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Diagnostics.Contracts;
 
-namespace oledid.SyntaxImprovement.Extensions
+namespace oledid.SyntaxImprovement
 {
 	public static class TimeSpanExtensions
 	{

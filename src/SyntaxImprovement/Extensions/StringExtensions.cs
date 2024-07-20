@@ -3,7 +3,7 @@ using System.Diagnostics.Contracts;
 using System.Linq;
 using System.Text.RegularExpressions;
 
-namespace oledid.SyntaxImprovement.Extensions
+namespace oledid.SyntaxImprovement
 {
 	public static class StringExtensions
 	{
@@ -122,7 +122,7 @@ namespace oledid.SyntaxImprovement.Extensions
 
 			var substring = str.Substring(index + matchString.Length);
 			return includeMatchStringInResult
-				? matchString + substring
+				? (matchString + substring)
 				: substring;
 		}
 
@@ -144,7 +144,7 @@ namespace oledid.SyntaxImprovement.Extensions
 
 			var substring = str.Substring(index + matchString.Length);
 			return includeMatchStringInResult
-				? matchString + substring
+				? (matchString + substring)
 				: substring;
 		}
 

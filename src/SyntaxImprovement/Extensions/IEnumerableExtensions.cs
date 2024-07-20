@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 
-namespace oledid.SyntaxImprovement.Extensions
+namespace oledid.SyntaxImprovement
 {
 	// ReSharper disable once InconsistentNaming
 	public static class IEnumerableExtensions

@@ -1,4 +1,4 @@
-﻿namespace oledid.SyntaxImprovement.Extensions
+﻿namespace oledid.SyntaxImprovement
 {
 	public static class CharExtensions
 	{

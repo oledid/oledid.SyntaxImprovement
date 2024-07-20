@@ -1,6 +1,6 @@
 ﻿using System;
 
-namespace oledid.SyntaxImprovement.Extensions
+namespace oledid.SyntaxImprovement
 {
 	public static class GuidExtensions
 	{
@@ -17,7 +17,7 @@ namespace oledid.SyntaxImprovement.Extensions
 
 		public static bool HasValue(this Guid input)
 		{
-			return !input.IsEmpty();
+			return !IsEmpty(input);
 		}
 
 		public static bool IsEmpty(this Guid input)

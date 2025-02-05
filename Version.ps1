@@ -8,7 +8,7 @@ $pattern = '^\[assembly: AssemblyVersion\("(.*)"\)\]'
 $assemblyFiles = Get-ChildItem -Recurse . AssemblyInfo.cs
 
 $nugetIndexStr = curl https://api.github.com/repos/oledid/oledid.SyntaxImprovement/releases/latest -s | jq .name -r
-if ($a -match "v(\d+)\.(\d+)\.(\d+)") {
+if ($nugetIndexStr -match "v(\d+)\.(\d+)\.(\d+)") {
     $lastPackageMajor = $matches[1]
     $lastPackageMinor = $matches[2]
     $lastPackageBuildNo = $matches[3]
@@ -21,9 +21,6 @@ else {
 $buildCounter = ([long]$lastPackageBuildNo + 1).ToString()
 if ("$major.$minor" -ne "$lastPackageMajor.$lastPackageMinor") {
 	$buildCounter = "0"
-}
-else {
-    $buildCounter = "0"
 }
 
 $build = $buildCounter

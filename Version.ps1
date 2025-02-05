@@ -7,16 +7,20 @@ $minor = "1"
 $pattern = '^\[assembly: AssemblyVersion\("(.*)"\)\]'
 $assemblyFiles = Get-ChildItem -Recurse . AssemblyInfo.cs
 
-$apiFilePath = "nuget-index.json"
-if (Test-Path $apiFilePath -PathType Leaf) {
-    $nugetIndexStr = Get-Content $apiFilePath | out-string
-    $nugetIndexJson = ConvertFrom-Json $nugetIndexStr
-    $lastPackageBuildNo = ($nugetIndexJson.items.upper | select-string -pattern '^\d+\.\d+\.(\d+).*').matches.groups[1].Value
-    $lastPackageMajorMinor = ($nugetIndexJson.items.upper | select-string -pattern '^(\d+\.\d+)\.\d+.*').matches.groups[1].Value
-    $buildCounter = ([long]$lastPackageBuildNo + 1).ToString()
-    if ("$major.$minor" -ne $lastPackageMajorMinor) {
-        $buildCounter = "0"
-    }
+$nugetIndexStr = curl https://api.github.com/repos/oledid/oledid.SyntaxImprovement/releases/latest -s | jq .name -r
+if ($a -match "v(\d+)\.(\d+)\.(\d+)") {
+    $lastPackageMajor = $matches[1]
+    $lastPackageMinor = $matches[2]
+    $lastPackageBuildNo = $matches[3]
+}
+else {
+	$lastPackageMajor = "0"
+    $lastPackageMinor = "0"
+    $lastPackageBuildNo = "0"
+}
+$buildCounter = ([long]$lastPackageBuildNo + 1).ToString()
+if ("$major.$minor" -ne "$lastPackageMajor.$lastPackageMinor") {
+	$buildCounter = "0"
 }
 else {
     $buildCounter = "0"

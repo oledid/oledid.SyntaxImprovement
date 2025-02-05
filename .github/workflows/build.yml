@@ -12,9 +12,6 @@ jobs:
 
     - run: choco install curl
 
-    - name: Download info about the last package
-      run: 'curl --silent -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" "https://nuget.pkg.github.com/oledid/oledid.SyntaxImprovement/index.json" > nuget-index.json'
-
     - name: Prepare version
       run: pwsh prepare-version.ps1 -commitish ${{ github.sha }}
 

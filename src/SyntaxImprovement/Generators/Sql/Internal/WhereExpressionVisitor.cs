@@ -63,6 +63,27 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 				}
 			}
 
+			// Handle LINQ methods: First() and Single() for constants
+			if (node.Method.DeclaringType == typeof(Enumerable))
+			{
+				if (node.Method.Name.In("First", "Single"))
+				{
+					// Try to evaluate the method call
+					var lambda = Expression.Lambda(node);
+					var compiled = lambda.Compile();
+					var value = compiled.DynamicInvoke();
+
+					var parameterizedValue = parameterFactory.Create(value);
+					stringBuilder.Append(parameterizedValue);
+
+					return node;
+				}
+				else
+				{
+					throw new NotSupportedException("The method " + node.Method.Name + " is not supported in this context.");
+				}
+			}
+
 			return base.VisitMethodCall(node);
 		}
 

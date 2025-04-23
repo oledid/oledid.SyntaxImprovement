@@ -24,10 +24,10 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			if (databaseType == DatabaseType.SQLite)
 			{
 				var schemaValue = schemaName.HasValue()
-					? "\"" + schemaName + "\"."
+					? "\"" + schemaName + "_"
 					: string.Empty;
 
-				return schemaValue + "\"" + tableName + "\"";
+				return (schemaValue.Length == 0 ? "\"" : schemaValue) + tableName + "\"";
 			}
 			else
 			{
@@ -55,16 +55,8 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 					continue;
 				}
 
-				if (databaseType == DatabaseType.SQLite)
-				{
-					var name = "\"" + column.Name + "\"";
-					result.Add(name);
-				}
-				else
-				{
-					var name = "[" + column.Name + "]";
-					result.Add(name);
-				}
+				var name = databaseType.GetColumnName(column.Name);
+				result.Add(name);
 			}
 
 			return result;
@@ -73,14 +65,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		public string GetColumnName(MemberInfo memberInfo)
 		{
 			var column = GetColumn(memberInfo);
-			if (databaseType == DatabaseType.SQLite)
-			{
-				return "\"" + column.Name + "\"";
-			}
-			else
-			{
-				return "[" + column.Name + "]";
-			}
+			return databaseType.GetColumnName(memberInfo.Name);
 		}
 
 		public PropertyInfo GetColumn(MemberInfo memberInfo)

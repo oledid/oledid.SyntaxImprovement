@@ -53,24 +53,12 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 
 		private void AddStatement(MemberInfo member)
 		{
-			if (databaseType == DatabaseType.SQLite)
+			var columnExpression = databaseType.GetColumnName(member.Name);
+			if (ascending == false)
 			{
-				var columnExpression = "\"" + member.Name + "\"";
-				if (ascending == false)
-				{
-					columnExpression += " desc";
-				}
-				orderByStatements.Add(columnExpression);
+				columnExpression += " desc";
 			}
-			else
-			{
-				var columnExpression = "[" + member.Name + "]";
-				if (ascending == false)
-				{
-					columnExpression += " desc";
-				}
-				orderByStatements.Add(columnExpression);
-			}
+			orderByStatements.Add(columnExpression);
 		}
 
 		public string GetQuery()

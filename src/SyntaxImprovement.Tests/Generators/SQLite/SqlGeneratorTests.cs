@@ -22,7 +22,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sqlite
 			public void It_generates_correct_select_with_schema()
 			{
 				var query = new Select<PersonWithSchema>().ToQuery();
-				Assert.Equal("SELECT \"Id\", \"Name\" FROM \"MySchema\".\"Person\";", query.QueryText);
+				Assert.Equal("SELECT \"Id\", \"Name\" FROM \"MySchema_Person\";", query.QueryText);
 			}
 
 			[Fact]
@@ -397,7 +397,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sqlite
 					.Where(u => u.Id == user.Id)
 					.ToQuery();
 
-				Assert.Equal("UPDATE \"userschema\".\"User\" SET \"PersonId\" = :p1, \"IsActive\" = :p2, \"IsAdmin\" = :p3, \"CanWrite\" = :p4 WHERE \"Id\" IS :p0", query.QueryText);
+				Assert.Equal("UPDATE \"userschema_User\" SET \"PersonId\" = :p1, \"IsActive\" = :p2, \"IsAdmin\" = :p3, \"CanWrite\" = :p4 WHERE \"Id\" IS :p0", query.QueryText);
 				Assert.Equal(userId, ((IDictionary<string, object>)((dynamic)query).Parameters)[":p0"]);
 				Assert.Equal(personId, ((IDictionary<string, object>)((dynamic)query).Parameters)[":p1"]);
 				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)[":p2"]);
@@ -475,7 +475,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sqlite
 				};
 				var query = new Insert<DataTypesModel>().Add(model).ToQuery();
 
-				Assert.Equal("INSERT INTO \"TestSchema\".\"DataTypesModel\" (\"Boolean\", \"Long\", \"Decimal\", \"DateTime\", \"Guid\", \"StringWithValue\", \"NullString\") SELECT :p0, :p1, :p2, :p3, :p4, :p5, :p6;", query.QueryText.Trim());
+				Assert.Equal("INSERT INTO \"TestSchema_DataTypesModel\" (\"Boolean\", \"Long\", \"Decimal\", \"DateTime\", \"Guid\", \"StringWithValue\", \"NullString\") SELECT :p0, :p1, :p2, :p3, :p4, :p5, :p6;", query.QueryText.Trim());
 				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)[":p0"]);
 				Assert.Equal(int.MaxValue + 1L, ((IDictionary<string, object>)((dynamic)query).Parameters)[":p1"]);
 				Assert.Equal(0.42m, ((IDictionary<string, object>)((dynamic)query).Parameters)[":p2"]);

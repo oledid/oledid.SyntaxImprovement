@@ -21,15 +21,11 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		public string GetColumnName()
 		{
 			if (memberInfo == null)
+			{
 				throw new NotSupportedException("Could not find valid column from Update.Set-expression");
-			if (databaseType == DatabaseType.SQLite)
-			{
-				return "\"" + memberInfo.Name + "\"";
 			}
-			else
-			{
-				return "[" + memberInfo.Name + "]";
-			}
+
+			return databaseType.GetColumnName(memberInfo.Name);
 		}
 
 		public bool IsComputedField()

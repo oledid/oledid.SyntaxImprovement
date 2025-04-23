@@ -19,5 +19,24 @@
 				_ => " IS DISTINCT FROM "
 			};
 		}
+
+		public static string GetColumnName(this DatabaseType databaseType, string columnName)
+		{
+			return databaseType switch
+			{
+				DatabaseType.SQLite => "\"" + columnName + "\"",
+				_ => "[" + columnName + "]"
+			};
+		}
+
+		public static string GetInsertedIdentity(this DatabaseType databaseType, string identityColumn)
+		{
+			return databaseType switch
+			{
+				DatabaseType.PostgreSQL => " RETURNING " + databaseType.GetColumnName(identityColumn) + ";",
+				DatabaseType.MSSQL => "; SELECT SCOPE_IDENTITY();",
+				_ => "; SELECT last_insert_rowid();"
+			};
+		}
 	}
 }

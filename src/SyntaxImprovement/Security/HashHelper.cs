@@ -34,7 +34,7 @@ namespace oledid.SyntaxImprovement.Security
 		public static string GetHashFromStream(HashAlgorithm algorithm, Stream input, int numFirstBytesToBeRead)
 		{
 			var buffer = new byte[numFirstBytesToBeRead];
-			input.Read(buffer, offset: 0, count: numFirstBytesToBeRead);
+			input.ReadExactly(buffer, offset: 0, count: numFirstBytesToBeRead);
 			var bytesOut = algorithm.ComputeHash(buffer);
 			var output = BitConverter.ToString(bytesOut);
 			return output.ToLowerInvariant();

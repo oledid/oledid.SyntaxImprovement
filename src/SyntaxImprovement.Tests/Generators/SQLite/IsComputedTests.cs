@@ -30,7 +30,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sqlite
 					.ToQuery();
 
 				Assert.Equal("INSERT INTO ModelWithComputedField (Id) VALUES (@p1);", query.QueryText.Trim());
-				Assert.Equal(3, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+				Assert.Equal(3, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
 			}
 			{
 				var instance = new ModelWithComputedField
@@ -44,7 +44,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sqlite
 					.ToQuery();
 
 				Assert.Equal("INSERT INTO ModelWithComputedField (Id) VALUES (@p1);", query.QueryText.Trim());
-				Assert.Equal(3, ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+				Assert.Equal(3, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
 			}
 		}
 	}

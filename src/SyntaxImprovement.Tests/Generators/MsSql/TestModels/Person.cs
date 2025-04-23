@@ -51,5 +51,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.MsSql.TestModels
 		{
 			return nameof(Person);
 		}
+
+		public override DatabaseType GetDatabaseType() => DatabaseType.MSSQL;
 	}
 }

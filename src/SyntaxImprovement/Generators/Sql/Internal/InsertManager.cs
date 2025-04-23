@@ -14,7 +14,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 
 		public SqlQuery ToQuery(IEnumerable<TableType> rows)
 		{
-			var parameterFactory = new ParameterFactory();
+			var parameterFactory = new ParameterFactory(tableInformation.GetDatabaseType());
 			var query = "";
 
 			var rowList = rows.ToList();

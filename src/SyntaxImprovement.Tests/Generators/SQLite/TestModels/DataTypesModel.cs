@@ -15,6 +15,8 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sqlite.TestModels
 			return "TestSchema";
 		}
 
+		public override DatabaseType GetDatabaseType() => DatabaseType.SQLite;
+
 		public bool Boolean { get; set; }
 		public long Long { get; set; }
 		public decimal Decimal { get; set; }

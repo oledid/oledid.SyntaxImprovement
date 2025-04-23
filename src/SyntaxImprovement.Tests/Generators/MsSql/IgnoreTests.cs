@@ -31,8 +31,8 @@ namespace oledid.SyntaxImprovement.Tests.Generators.MsSql
 				.ToQuery();
 
 			Assert.Equal("INSERT INTO [ModelWithIgnoreField] ([Name]) SELECT @p0; SELECT SCOPE_IDENTITY();", query.QueryText.Trim());
-			Assert.Equal("a", ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
-			Assert.Throws<KeyNotFoundException>(() => ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+			Assert.Equal("a", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+			Assert.Throws<KeyNotFoundException>(() => ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
 		}
 	}
 }

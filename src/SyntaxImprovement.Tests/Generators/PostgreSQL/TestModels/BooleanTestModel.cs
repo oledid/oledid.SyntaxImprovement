@@ -6,6 +6,8 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL.TestModels
 	{
 		public override string GetTableName() => nameof(BooleanTestModel);
 
+		public override DatabaseType GetDatabaseType() => DatabaseType.PostgreSQL;
+
 		[IsPrimaryKey]
 		public string IdStr { get; set; }
 

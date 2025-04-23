@@ -10,5 +10,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL.TestModels
 		public bool IsDeleted { get; set; }
 
 		public override string GetTableName() => nameof(LongTestEntity).RemoveFromEnd("Entity");
+
+		public override DatabaseType GetDatabaseType() => DatabaseType.PostgreSQL;
 	}
 }

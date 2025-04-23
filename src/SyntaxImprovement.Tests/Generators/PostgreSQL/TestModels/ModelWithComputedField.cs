@@ -13,5 +13,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL.TestModels
 		{
 			return nameof(ModelWithComputedField);
 		}
+
+		public override DatabaseType GetDatabaseType() => DatabaseType.PostgreSQL;
 	}
 }

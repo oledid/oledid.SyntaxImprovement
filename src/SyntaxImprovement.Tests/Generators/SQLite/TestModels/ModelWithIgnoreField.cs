@@ -14,5 +14,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sqlite.TestModels
 		public string Nope { get; set; }
 
 		public override string GetTableName() => nameof(ModelWithIgnoreField);
+
+		public override DatabaseType GetDatabaseType() => DatabaseType.SQLite;
 	}
 }

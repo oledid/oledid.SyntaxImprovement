@@ -26,5 +26,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL.TestModels
 		{
 			return "userschema";
 		}
+
+		public override DatabaseType GetDatabaseType() => DatabaseType.PostgreSQL;
 	}
 }

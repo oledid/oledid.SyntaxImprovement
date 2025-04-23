@@ -15,6 +15,8 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sqlite.TestModels
 		{
 			return nameof(Person);
 		}
+
+		public override DatabaseType GetDatabaseType() => DatabaseType.SQLite;
 	}
 
 	public class PersonWithSchema : DatabaseTable
@@ -34,6 +36,8 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sqlite.TestModels
 		{
 			return "MySchema";
 		}
+
+		public override DatabaseType GetDatabaseType() => DatabaseType.SQLite;
 	}
 
 	public class PersonWithComputedField : DatabaseTable
@@ -51,5 +55,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sqlite.TestModels
 		{
 			return nameof(Person);
 		}
+
+		public override DatabaseType GetDatabaseType() => DatabaseType.SQLite;
 	}
 }

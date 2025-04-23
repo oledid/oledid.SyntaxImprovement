@@ -31,7 +31,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sqlite
 				.ToQuery();
 
 			Assert.Equal("INSERT INTO ModelWithIgnoreField (Name) VALUES (@p1);", query.QueryText.Trim());
-			Assert.Equal("a", ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+			Assert.Equal("a", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
 			Assert.Throws<KeyNotFoundException>(() => ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
 		}
 	}

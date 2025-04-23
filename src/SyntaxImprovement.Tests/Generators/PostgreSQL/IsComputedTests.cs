@@ -30,7 +30,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 					.ToQuery();
 
 				Assert.Equal("INSERT INTO [ModelWithComputedField] ([Id]) SELECT $1;", query.QueryText.Trim());
-				Assert.Equal(3, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+				Assert.Equal(3, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
 			}
 			{
 				var instance = new ModelWithComputedField
@@ -44,7 +44,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 					.ToQuery();
 
 				Assert.Equal("INSERT INTO [ModelWithComputedField] ([Id]) SELECT $1;", query.QueryText.Trim());
-				Assert.Equal(3, ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
+				Assert.Equal(3, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
 			}
 		}
 	}

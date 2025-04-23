@@ -6,6 +6,8 @@ namespace oledid.SyntaxImprovement.Tests.Generators.MsSql.TestModels
 	{
 		public override string GetTableName() => nameof(BooleanTestModel);
 
+		public override DatabaseType GetDatabaseType() => DatabaseType.MSSQL;
+
 		[IsPrimaryKey]
 		public string IdStr { get; set; }
 

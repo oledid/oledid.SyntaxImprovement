@@ -25,16 +25,9 @@ namespace oledid.SyntaxImprovement.Generators.Sql
 		/// </summary>
 		public IEnumerable<KeyValuePair<string, object>> EnumerateParameters()
 		{
-			var iterator = 0;
-			while (true)
+			foreach (var kvp in (IDictionary<string, object>)Parameters)
 			{
-				var key = "p" + iterator;
-				if (((IDictionary<string, object>)Parameters).ContainsKey(key) == false)
-					yield break;
-
-				yield return new KeyValuePair<string, object>(key, ((IDictionary<string, object>)Parameters)[key]);
-
-				iterator = iterator + 1;
+				yield return kvp;
 			}
 		}
 	}

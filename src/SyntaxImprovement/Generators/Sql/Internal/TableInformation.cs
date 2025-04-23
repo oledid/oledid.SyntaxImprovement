@@ -7,22 +7,20 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 {
 	internal class TableInformation<TableType> where TableType : DatabaseTable, new()
 	{
-		private string tableName;
-		private string schemaName;
+		private readonly string tableName;
+		private readonly string schemaName;
+		private readonly DatabaseType databaseType;
 
 		public TableInformation()
 		{
+			var instance = new TableType();
+			tableName = instance.GetTableName();
+			schemaName = instance.GetSchemaName();
+			databaseType = instance.GetDatabaseType();
 		}
 
 		public string GetSchemaAndTableName()
 		{
-			if (tableName == null)
-			{
-				var instance = new TableType();
-				tableName = instance.GetTableName();
-				schemaName = instance.GetSchemaName();
-			}
-
 			var schemaValue = schemaName.HasValue()
 				? "[" + schemaName + "]."
 				: string.Empty;
@@ -96,6 +94,11 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		public PropertyInfo GetIdentityColumn()
 		{
 			return GetColumns().SingleOrDefault(column => Attribute.IsDefined(column, typeof(IsIdentityAttribute)));
+		}
+
+		public DatabaseType GetDatabaseType()
+		{
+			return databaseType;
 		}
 	}
 }

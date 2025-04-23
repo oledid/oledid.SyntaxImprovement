@@ -1,9 +1,9 @@
 ﻿using oledid.SyntaxImprovement.Generators.Sql;
-using oledid.SyntaxImprovement.Tests.Generators.Sql.TestModels;
+using oledid.SyntaxImprovement.Tests.Generators.PostgreSQL.TestModels;
 using System.Collections.Generic;
 using Xunit;
 
-namespace oledid.SyntaxImprovement.Tests.Generators.Sql
+namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 {
 	public class IgnoreTests
 	{
@@ -30,9 +30,9 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql
 				.Add(instance)
 				.ToQuery();
 
-			Assert.Equal("INSERT INTO [ModelWithIgnoreField] ([Name]) SELECT @p0; SELECT SCOPE_IDENTITY();", query.QueryText.Trim());
-			Assert.Equal("a", ((IDictionary<string, object>)((dynamic)query).Parameters)["p0"]);
-			Assert.Throws<KeyNotFoundException>(() => ((IDictionary<string, object>)((dynamic)query).Parameters)["p1"]);
+			Assert.Equal("INSERT INTO [ModelWithIgnoreField] ([Name]) SELECT $1; SELECT SCOPE_IDENTITY();", query.QueryText.Trim());
+			Assert.Equal("a", ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
+			Assert.Throws<KeyNotFoundException>(() => ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
 		}
 	}
 }

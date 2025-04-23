@@ -1,6 +1,6 @@
 ﻿using oledid.SyntaxImprovement.Generators.Sql;
 
-namespace oledid.SyntaxImprovement.Tests.Generators.Sql.TestModels
+namespace oledid.SyntaxImprovement.Tests.Generators.Sqlite.TestModels
 {
 	public class LongTestEntity : DatabaseTable
 	{

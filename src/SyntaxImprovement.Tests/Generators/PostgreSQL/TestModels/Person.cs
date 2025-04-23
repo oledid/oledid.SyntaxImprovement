@@ -1,7 +1,7 @@
 ﻿using oledid.SyntaxImprovement.Generators.Sql;
 using System;
 
-namespace oledid.SyntaxImprovement.Tests.Generators.Sql.TestModels
+namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL.TestModels
 {
 	public class Person : DatabaseTable
 	{

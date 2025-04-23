@@ -30,7 +30,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 				.Add(instance)
 				.ToQuery();
 
-			Assert.Equal("INSERT INTO [ModelWithIgnoreField] ([Name]) SELECT $1; SELECT SCOPE_IDENTITY();", query.QueryText.Trim());
+			Assert.Equal("INSERT INTO [ModelWithIgnoreField] ([Name]) SELECT $1 RETURNING [Id];", query.QueryText.Trim());
 			Assert.Equal("a", ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
 			Assert.Throws<KeyNotFoundException>(() => ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
 		}

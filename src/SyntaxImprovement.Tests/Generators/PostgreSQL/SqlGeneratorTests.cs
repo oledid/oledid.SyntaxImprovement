@@ -414,7 +414,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 				var person = new Person { Id = 1, Name = "Peter" };
 				var query = new Insert<Person>().Add(person).ToQuery();
 
-				Assert.Equal("INSERT INTO [Person] ([Name]) SELECT $1; SELECT SCOPE_IDENTITY();", query.QueryText);
+				Assert.Equal("INSERT INTO [Person] ([Name]) SELECT $1 RETURNING [Id];", query.QueryText);
 				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
 			}
 

@@ -92,8 +92,16 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		{
 			if (node.Expression.Type == typeof(TableType) && node.Expression.NodeType == ExpressionType.Parameter)
 			{
-				var columnExpression = "[" + node.Member.Name + "]";
-				stringBuilder.Append(columnExpression);
+				if (databaseType == DatabaseType.SQLite)
+				{
+					var columnExpression = "\"" + node.Member.Name + "\"";
+					stringBuilder.Append(columnExpression);
+				}
+				else
+				{
+					var columnExpression = "[" + node.Member.Name + "]";
+					stringBuilder.Append(columnExpression);
+				}
 
 				if (IsSingleExpression == false)
 				{

@@ -21,11 +21,22 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 
 		public string GetSchemaAndTableName()
 		{
-			var schemaValue = schemaName.HasValue()
-				? "[" + schemaName + "]."
-				: string.Empty;
+			if (databaseType == DatabaseType.SQLite)
+			{
+				var schemaValue = schemaName.HasValue()
+					? "\"" + schemaName + "\"."
+					: string.Empty;
 
-			return schemaValue + "[" + tableName + "]";
+				return schemaValue + "\"" + tableName + "\"";
+			}
+			else
+			{
+				var schemaValue = schemaName.HasValue()
+					? "[" + schemaName + "]."
+					: string.Empty;
+
+				return schemaValue + "[" + tableName + "]";
+			}
 		}
 
 		public List<string> GetColumnNames(bool excludeIdentityColumns = false, bool excludeComputedFields = false, bool excludeIgnoredFields = false, IncludeFields<TableType> fieldsToInclude = null)
@@ -44,8 +55,16 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 					continue;
 				}
 
-				var name = "[" + column.Name + "]";
-				result.Add(name);
+				if (databaseType == DatabaseType.SQLite)
+				{
+					var name = "\"" + column.Name + "\"";
+					result.Add(name);
+				}
+				else
+				{
+					var name = "[" + column.Name + "]";
+					result.Add(name);
+				}
 			}
 
 			return result;
@@ -54,7 +73,14 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		public string GetColumnName(MemberInfo memberInfo)
 		{
 			var column = GetColumn(memberInfo);
-			return "[" + column.Name + "]";
+			if (databaseType == DatabaseType.SQLite)
+			{
+				return "\"" + column.Name + "\"";
+			}
+			else
+			{
+				return "[" + column.Name + "]";
+			}
 		}
 
 		public PropertyInfo GetColumn(MemberInfo memberInfo)

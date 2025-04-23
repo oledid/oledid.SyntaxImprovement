@@ -44,6 +44,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			return databaseType switch
 			{
 				DatabaseType.PostgreSQL => "$",
+				DatabaseType.SQLite => ":p",
 				_ => "@p",
 			};
 		}

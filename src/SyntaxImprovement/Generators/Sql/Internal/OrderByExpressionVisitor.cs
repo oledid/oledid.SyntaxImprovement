@@ -11,12 +11,14 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		private readonly Stack<MemberInfo> memberStack;
 		private readonly List<string> orderByStatements;
 		private readonly bool ascending;
+		private readonly DatabaseType databaseType;
 
 		internal OrderByExpressionVisitor(bool ascending)
 		{
 			memberStack = new Stack<MemberInfo>();
 			orderByStatements = new List<string>();
 			this.ascending = ascending;
+			databaseType = new TableInformation<TableType>().GetDatabaseType();
 		}
 
 		protected override Expression VisitBinary(BinaryExpression node)
@@ -51,12 +53,24 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 
 		private void AddStatement(MemberInfo member)
 		{
-			var columnExpression = "[" + member.Name + "]";
-			if (ascending == false)
+			if (databaseType == DatabaseType.SQLite)
 			{
-				columnExpression += " desc";
+				var columnExpression = "\"" + member.Name + "\"";
+				if (ascending == false)
+				{
+					columnExpression += " desc";
+				}
+				orderByStatements.Add(columnExpression);
 			}
-			orderByStatements.Add(columnExpression);
+			else
+			{
+				var columnExpression = "[" + member.Name + "]";
+				if (ascending == false)
+				{
+					columnExpression += " desc";
+				}
+				orderByStatements.Add(columnExpression);
+			}
 		}
 
 		public string GetQuery()

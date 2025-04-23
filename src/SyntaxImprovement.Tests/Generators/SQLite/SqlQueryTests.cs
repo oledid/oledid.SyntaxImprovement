@@ -26,13 +26,13 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sqlite
 
 			var list = query.EnumerateParameters().ToList();
 
-			Assert.Equal(new KeyValuePair<string, object>("@p1", true), list[0]);
-			Assert.Equal(new KeyValuePair<string, object>("@p2", int.MaxValue + 1L), list[1]);
-			Assert.Equal(new KeyValuePair<string, object>("@p3", 0.42m), list[2]);
-			Assert.Equal(new KeyValuePair<string, object>("@p4", new DateTime(2018, 2, 23, 13, 37, 0)), list[3]);
-			Assert.Equal(new KeyValuePair<string, object>("@p5", new Guid("67a76215-bc11-41cb-838f-c43fe81efcae")), list[4]);
-			Assert.Equal(new KeyValuePair<string, object>("@p6", "abc123"), list[5]);
-			Assert.Equal(new KeyValuePair<string, object>("@p7", null), list[6]);
+			Assert.Equal(new KeyValuePair<string, object>(":p0", true), list[0]);
+			Assert.Equal(new KeyValuePair<string, object>(":p1", int.MaxValue + 1L), list[1]);
+			Assert.Equal(new KeyValuePair<string, object>(":p2", 0.42m), list[2]);
+			Assert.Equal(new KeyValuePair<string, object>(":p3", new DateTime(2018, 2, 23, 13, 37, 0)), list[3]);
+			Assert.Equal(new KeyValuePair<string, object>(":p4", new Guid("67a76215-bc11-41cb-838f-c43fe81efcae")), list[4]);
+			Assert.Equal(new KeyValuePair<string, object>(":p5", "abc123"), list[5]);
+			Assert.Equal(new KeyValuePair<string, object>(":p6", null), list[6]);
 			Assert.Equal(7, list.Count);
 		}
 

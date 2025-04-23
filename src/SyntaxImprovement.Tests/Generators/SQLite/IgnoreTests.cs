@@ -13,7 +13,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sqlite
 			var query = new Select<ModelWithIgnoreField>()
 				.ToQuery();
 
-			Assert.Equal("SELECT Id, Name FROM ModelWithIgnoreField;", query.QueryText);
+			Assert.Equal("SELECT \"Id\", \"Name\" FROM \"ModelWithIgnoreField\";", query.QueryText);
 		}
 
 		[Fact]
@@ -30,9 +30,9 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sqlite
 				.Add(instance)
 				.ToQuery();
 
-			Assert.Equal("INSERT INTO ModelWithIgnoreField (Name) VALUES (@p1);", query.QueryText.Trim());
-			Assert.Equal("a", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
-			Assert.Throws<KeyNotFoundException>(() => ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
+			Assert.Equal("INSERT INTO \"ModelWithIgnoreField\" (\"Name\") SELECT :p0; SELECT last_insert_rowid();", query.QueryText.Trim());
+			Assert.Equal("a", ((IDictionary<string, object>)((dynamic)query).Parameters)[":p0"]);
+			Assert.Throws<KeyNotFoundException>(() => ((IDictionary<string, object>)((dynamic)query).Parameters)[":p1"]);
 		}
 	}
 }

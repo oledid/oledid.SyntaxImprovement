@@ -7,6 +7,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 	internal class ColumnExpressionVisitor<TableType> : ExpressionVisitor where TableType : DatabaseTable, new()
 	{
 		private MemberInfo memberInfo;
+		private readonly DatabaseType databaseType = new TableInformation<TableType>().GetDatabaseType();
 
 		protected override Expression VisitMember(MemberExpression node)
 		{
@@ -21,7 +22,14 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		{
 			if (memberInfo == null)
 				throw new NotSupportedException("Could not find valid column from Update.Set-expression");
-			return "[" + memberInfo.Name + "]";
+			if (databaseType == DatabaseType.SQLite)
+			{
+				return "\"" + memberInfo.Name + "\"";
+			}
+			else
+			{
+				return "[" + memberInfo.Name + "]";
+			}
 		}
 
 		public bool IsComputedField()

@@ -11,6 +11,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		private readonly List<Tuple<Expression<Func<TableType, object>>, bool>> orderByStatements;
 		private readonly int? TopOrNull;
 		private readonly IncludeFields<TableType> FieldsToInclude;
+		private readonly DatabaseType databaseType = new TableInformation<TableType>().GetDatabaseType();
 
 		public SelectManager(int? top, IncludeFields<TableType> fieldsToInclude)
 		{
@@ -42,17 +43,32 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		private string CreateQuery(ParameterFactory parameterFactory)
 		{
 			var tableName = tableInformation.GetSchemaAndTableName();
-			var topPart = TopOrNull == null
-				? string.Empty
-				: "TOP " + TopOrNull.Value + " ";
 			var columns = tableInformation.GetColumnNames(excludeIgnoredFields: true, fieldsToInclude: FieldsToInclude);
 			var whereQueryPart = WhereGenerator.CreateQuery(parameterFactory, whereStatement);
 			var orderByQueryPart = OrderByGenerator.CreateQuery(orderByStatements);
-			return
-				  "SELECT " + topPart + string.Join(", ", columns)
-				+ " FROM " + tableName
-				+ whereQueryPart
-				+ orderByQueryPart + ";";
+
+			if (databaseType == DatabaseType.SQLite)
+			{
+				var topPart = TopOrNull == null
+					? string.Empty
+					: " LIMIT " + TopOrNull.Value;
+				return
+					  "SELECT " + string.Join(", ", columns)
+					+ " FROM " + tableName
+					+ whereQueryPart
+					+ orderByQueryPart + topPart + ";";
+			}
+			else
+			{
+				var topPart = TopOrNull == null
+					? string.Empty
+					: "TOP " + TopOrNull.Value + " ";
+				return
+					  "SELECT " + topPart + string.Join(", ", columns)
+					+ " FROM " + tableName
+					+ whereQueryPart
+					+ orderByQueryPart + ";";
+			}
 		}
 
 		public void OrderByExpression(Expression<Func<TableType, object>> expression, bool ascending)

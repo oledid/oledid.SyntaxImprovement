@@ -6,7 +6,12 @@ jobs:
     if: github.ref == 'refs/heads/master'
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Set Git to checkout with CRLF
+      run: git config --global core.autocrlf true
 
     - name: Install required tools
       run: |
@@ -51,7 +56,12 @@ jobs:
     if: github.ref == 'refs/heads/dev'
 
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v3
+      with:
+        fetch-depth: 0
+
+    - name: Set Git to checkout with CRLF
+      run: git config --global core.autocrlf true
 
     - name: Install required tools
       run: |

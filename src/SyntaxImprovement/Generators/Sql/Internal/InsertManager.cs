@@ -1,4 +1,5 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 
 namespace oledid.SyntaxImprovement.Generators.Sql.Internal
@@ -14,7 +15,8 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 
 		public SqlQuery ToQuery(IEnumerable<TableType> rows)
 		{
-			var parameterFactory = new ParameterFactory();
+			var databaseType = tableInformation.GetDatabaseType();
+			var parameterFactory = new ParameterFactory(databaseType);
 			var query = "";
 
 			var rowList = rows.ToList();
@@ -25,10 +27,16 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 				var columns = tableInformation.GetColumnNames(excludeIdentityColumns: true, excludeComputedFields: true, excludeIgnoredFields: true);
 				var values = tableInformation.GetColumnValues(row, excludeIdentityColumns: true, excludeComputedFields: true, excludeIgnoredFields: true);
 				var identityColumn = tableInformation.GetIdentityColumn();
-				query += "INSERT INTO " + tableName + " (" + string.Join(", ", columns) + ") SELECT " + string.Join(", ", values.Select(parameterFactory.Create)) + "; ";
+				query += "INSERT INTO " + tableName + " (" + string.Join(", ", columns);
+				query += ") SELECT " + string.Join(", ", values.Select(parameterFactory.Create));
+
 				if (identityColumn != null && rowList.Count == 1)
 				{
-					query += "SELECT SCOPE_IDENTITY();";
+					query += databaseType.GetInsertedIdentity(identityColumn.Name);
+				}
+				else
+				{
+					query += "; ";
 				}
 			}
 

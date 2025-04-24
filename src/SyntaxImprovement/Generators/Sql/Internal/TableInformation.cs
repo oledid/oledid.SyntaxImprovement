@@ -7,27 +7,36 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 {
 	internal class TableInformation<TableType> where TableType : DatabaseTable, new()
 	{
-		private string tableName;
-		private string schemaName;
+		private readonly string tableName;
+		private readonly string schemaName;
+		private readonly DatabaseType databaseType;
 
 		public TableInformation()
 		{
+			var instance = new TableType();
+			tableName = instance.GetTableName();
+			schemaName = instance.GetSchemaName();
+			databaseType = instance.GetDatabaseType();
 		}
 
 		public string GetSchemaAndTableName()
 		{
-			if (tableName == null)
+			if (databaseType == DatabaseType.SQLite)
 			{
-				var instance = new TableType();
-				tableName = instance.GetTableName();
-				schemaName = instance.GetSchemaName();
+				var schemaValue = schemaName.HasValue()
+					? "\"" + schemaName + "_"
+					: string.Empty;
+
+				return (schemaValue.Length == 0 ? "\"" : schemaValue) + tableName + "\"";
 			}
+			else
+			{
+				var schemaValue = schemaName.HasValue()
+					? databaseType.GetColumnName(schemaName) + "."
+					: string.Empty;
 
-			var schemaValue = schemaName.HasValue()
-				? "[" + schemaName + "]."
-				: string.Empty;
-
-			return schemaValue + "[" + tableName + "]";
+				return schemaValue + databaseType.GetColumnName(tableName);
+			}
 		}
 
 		public List<string> GetColumnNames(bool excludeIdentityColumns = false, bool excludeComputedFields = false, bool excludeIgnoredFields = false, IncludeFields<TableType> fieldsToInclude = null)
@@ -46,7 +55,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 					continue;
 				}
 
-				var name = "[" + column.Name + "]";
+				var name = databaseType.GetColumnName(column.Name);
 				result.Add(name);
 			}
 
@@ -56,7 +65,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		public string GetColumnName(MemberInfo memberInfo)
 		{
 			var column = GetColumn(memberInfo);
-			return "[" + column.Name + "]";
+			return databaseType.GetColumnName(memberInfo.Name);
 		}
 
 		public PropertyInfo GetColumn(MemberInfo memberInfo)
@@ -96,6 +105,11 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		public PropertyInfo GetIdentityColumn()
 		{
 			return GetColumns().SingleOrDefault(column => Attribute.IsDefined(column, typeof(IsIdentityAttribute)));
+		}
+
+		public DatabaseType GetDatabaseType()
+		{
+			return databaseType;
 		}
 	}
 }

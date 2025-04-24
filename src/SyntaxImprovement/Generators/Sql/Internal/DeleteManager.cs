@@ -22,7 +22,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 
 		public SqlQuery ToQuery()
 		{
-			var parameterFactory = new ParameterFactory();
+			var parameterFactory = new ParameterFactory(tableInformation.GetDatabaseType());
 			var query = CreateQuery(parameterFactory);
 			return new SqlQuery(query, parameterFactory.GetParameters());
 		}

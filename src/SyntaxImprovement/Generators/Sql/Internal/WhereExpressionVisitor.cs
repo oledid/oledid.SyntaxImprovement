@@ -12,6 +12,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		private readonly ParameterFactory parameterFactory;
 		private readonly StringBuilder stringBuilder;
 		private readonly Stack<ExpressionType> operatorStack;
+		private readonly DatabaseType databaseType = new TableType().GetDatabaseType();
 
 		private bool IsSingleExpression = true;
 
@@ -26,11 +27,11 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		{
 			if (node.Method.Name == "Contains")
 			{
-				var argumentVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory());
+				var argumentVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory(databaseType));
 				argumentVisitor.IsSingleExpression = false;
 				argumentVisitor.Visit(node.Arguments);
 
-				var callVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory());
+				var callVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory(databaseType));
 				callVisitor.IsSingleExpression = false;
 				callVisitor.Visit(node.Object);
 
@@ -91,7 +92,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		{
 			if (node.Expression.Type == typeof(TableType) && node.Expression.NodeType == ExpressionType.Parameter)
 			{
-				var columnExpression = "[" + node.Member.Name + "]";
+				var columnExpression = databaseType.GetColumnName(node.Member.Name);
 				stringBuilder.Append(columnExpression);
 
 				if (IsSingleExpression == false)
@@ -99,7 +100,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 					return node;
 				}
 
-				stringBuilder.Append(" IS NOT DISTINCT FROM ");
+				stringBuilder.Append(databaseType.GetEqualsOperator());
 				stringBuilder.Append(parameterFactory.Create(true));
 				return node;
 			}
@@ -186,7 +187,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 
 		protected override Expression VisitLambda<T>(Expression<T> node)
 		{
-			var callVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory());
+			var callVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory(databaseType));
 			callVisitor.Visit(node.Body);
 
 			return base.VisitLambda(node);
@@ -196,12 +197,12 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		{
 			if (node.NodeType == ExpressionType.Not)
 			{
-				var operandVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory());
+				var operandVisitor = new WhereExpressionVisitor<TableType>(new ParameterFactory(databaseType));
 				operandVisitor.IsSingleExpression = false;
 				operandVisitor.Visit(node.Operand);
 
 				stringBuilder.Append(operandVisitor.stringBuilder.ToString());
-				stringBuilder.Append(" IS NOT DISTINCT FROM ");
+				stringBuilder.Append(databaseType.GetEqualsOperator());
 				stringBuilder.Append(parameterFactory.Create(false));
 				return node;
 			}
@@ -209,17 +210,17 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			return base.VisitUnary(node);
 		}
 
-		private static string GetOperatorExpression(ExpressionType @operator, Expression leftExpression, Expression rightExpression)
+		private string GetOperatorExpression(ExpressionType @operator, Expression leftExpression, Expression rightExpression)
 		{
 			switch (@operator)
 			{
 				case ExpressionType.Equal:
 					{
-						return " IS NOT DISTINCT FROM ";
+						return databaseType.GetEqualsOperator();
 					}
 				case ExpressionType.NotEqual:
 					{
-						return " IS DISTINCT FROM ";
+						return databaseType.GetNotEqualsOperator();
 					}
 				case ExpressionType.LessThan:
 					return " < ";

@@ -1,7 +1,7 @@
 ﻿using System;
 using oledid.SyntaxImprovement.Generators.Sql;
 
-namespace oledid.SyntaxImprovement.Tests.Generators.Sql.TestModels
+namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL.TestModels
 {
 	public class User : DatabaseTable
 	{
@@ -26,5 +26,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql.TestModels
 		{
 			return "userschema";
 		}
+
+		public override DatabaseType GetDatabaseType() => DatabaseType.PostgreSQL;
 	}
 }

@@ -1,6 +1,6 @@
 ﻿using oledid.SyntaxImprovement.Generators.Sql;
 
-namespace oledid.SyntaxImprovement.Tests.Generators.Sql.TestModels
+namespace oledid.SyntaxImprovement.Tests.Generators.MsSql.TestModels
 {
 	public class ModelWithComputedField : DatabaseTable
 	{

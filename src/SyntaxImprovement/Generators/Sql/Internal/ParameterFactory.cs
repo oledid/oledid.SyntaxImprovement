@@ -8,11 +8,14 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 {
 	internal class ParameterFactory
 	{
+		private readonly DatabaseType databaseType;
+
 		private int currentParameterIterator;
 		internal readonly List<Parameter> parameters;
 
-		public ParameterFactory()
+		public ParameterFactory(DatabaseType databaseType)
 		{
+			this.databaseType = databaseType;
 			currentParameterIterator = 0;
 			parameters = new List<Parameter>();
 		}
@@ -24,11 +27,20 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 
 			var parameter = new Parameter
 			{
-				Name = "@p" + currentParameterIterator++,
+				Name = GetParameterPrefix() + currentParameterIterator++,
 				Value = value
 			};
 			parameters.Add(parameter);
 			return parameter.Name;
+		}
+
+		private string GetParameterPrefix()
+		{
+			return databaseType switch
+			{
+				DatabaseType.SQLite => ":p",
+				_ => "@p",
+			};
 		}
 
 		private string CreateCollection(ICollection values)
@@ -52,7 +64,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			for (var i = 0; i < parameters.Count; i++)
 			{
 				var parameter = parameters[i];
-				((IDictionary<string, object>) obj)["p" + i] = parameter.Value;
+				((IDictionary<string, object>) obj)[parameter.Name] = parameter.Value;
 			}
 
 			return obj;

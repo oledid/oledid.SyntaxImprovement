@@ -1,7 +1,7 @@
 ﻿using oledid.SyntaxImprovement.Generators.Sql;
 using System;
 
-namespace oledid.SyntaxImprovement.Tests.Generators.Sql.TestModels
+namespace oledid.SyntaxImprovement.Tests.Generators.Sqlite.TestModels
 {
 	public class Person : DatabaseTable
 	{
@@ -15,6 +15,8 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql.TestModels
 		{
 			return nameof(Person);
 		}
+
+		public override DatabaseType GetDatabaseType() => DatabaseType.SQLite;
 	}
 
 	public class PersonWithSchema : DatabaseTable
@@ -34,6 +36,8 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql.TestModels
 		{
 			return "MySchema";
 		}
+
+		public override DatabaseType GetDatabaseType() => DatabaseType.SQLite;
 	}
 
 	public class PersonWithComputedField : DatabaseTable
@@ -51,5 +55,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.Sql.TestModels
 		{
 			return nameof(Person);
 		}
+
+		public override DatabaseType GetDatabaseType() => DatabaseType.SQLite;
 	}
 }

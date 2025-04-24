@@ -123,11 +123,13 @@ namespace oledid.SyntaxImprovement.Tests.Algorithms
 			}
 		}
 
+		#nullable enable
 		public class StringGroup
 		{
-			public string Id { get; set; }
+			public string Id { get; set; } = string.Empty;
 			public string? ParentId { get; set; }
 		}
+		#nullable restore
 
 		public class LongGroup
 		{

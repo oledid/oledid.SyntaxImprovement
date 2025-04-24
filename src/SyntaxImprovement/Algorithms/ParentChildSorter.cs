@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using System.Linq;
 
+#nullable enable
+
 namespace oledid.SyntaxImprovement.Algorithms
 {
 	public static class ParentChildSorter
@@ -77,3 +79,5 @@ namespace oledid.SyntaxImprovement.Algorithms
 		}
 	}
 }
+
+#nullable restore

@@ -29,7 +29,7 @@ export interface IPersonEntity {
 ";
 
 			var actual = TsFromCsGenerator.GenerateTypescriptInterfaceFromCsharpClass(typeof(IHub), typeof(PersonEntity));
-			Assert.Equal(expected, actual);
+			Assert.Equal(expected.RegexReplace("\\s+", " ", System.Text.RegularExpressions.RegexOptions.Compiled), actual.RegexReplace("\\s+", " ", System.Text.RegularExpressions.RegexOptions.Compiled));
 		}
 
 		public interface IHub

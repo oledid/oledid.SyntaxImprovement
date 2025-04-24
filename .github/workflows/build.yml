@@ -1,88 +1,69 @@
 name: Build
-on: [push]
+
+on:
+  push:
+    branches:
+      - master
+      - dev
+
 jobs:
-  build-master:
+  build:
     runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/master'
+
+    strategy:
+      matrix:
+        branch: [master, dev]
 
     steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-    - name: Set Git to checkout with CRLF
-      run: git config --global core.autocrlf true
+      - name: Set Git to checkout with CRLF
+        run: git config --global core.autocrlf true
 
-    - name: Install required tools
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y curl wget apt-transport-https software-properties-common sqlite3 libsqlite3-dev
-        wget -q "https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb"
-        sudo dpkg -i packages-microsoft-prod.deb
-        sudo apt-get update
-        sudo apt-get install -y powershell
+      - name: Install required tools
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y curl wget apt-transport-https software-properties-common sqlite3 libsqlite3-dev
+          wget -q "https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb"
+          sudo dpkg -i packages-microsoft-prod.deb
+          sudo apt-get update
+          sudo apt-get install -y powershell
 
-    - name: Prepare version
-      run: pwsh prepare-version.ps1 -commitish ${{ github.sha }}
+      - name: Prepare version
+        run: pwsh prepare-version.ps1 -commitish ${{ github.sha }}
 
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.x.x
+      - name: Setup .NET Core
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: 9.x.x
 
-    - name: Build with dotnet
-      run: dotnet build --configuration Release
+      - name: Build with dotnet
+        run: dotnet build --configuration Release
 
-    - name: Test with dotnet
-      run: dotnet test ./src/SyntaxImprovement.Tests/SyntaxImprovement.Tests.csproj --no-restore --framework net9.0 --verbosity detailed
+      - name: Test with dotnet
+        run: dotnet test ./src/SyntaxImprovement.Tests/SyntaxImprovement.Tests.csproj --no-restore --framework net9.0 --verbosity detailed
 
-    - name: Pack
-      run: pwsh pack.ps1
+      - name: Pack
+        run: pwsh pack.ps1
 
-    - name: List all *.nupkg
-      run: pwsh -Command "ls *.nupkg -Recurse"
+      - name: List all *.nupkg
+        run: pwsh -Command "ls *.nupkg -Recurse"
 
-    - name: Delete all *.symbols.nupkg
-      run: pwsh -Command "ls *.symbols.nupkg -Recurse | Remove-Item -Verbose"
+      - name: Delete all *.symbols.nupkg
+        run: pwsh -Command "ls *.symbols.nupkg -Recurse | Remove-Item -Verbose"
 
-    - name: Push to NuGet
-      run: dotnet nuget push "D:\a\oledid.SyntaxImprovement\oledid.SyntaxImprovement\src\SyntaxImprovement\bin\Release\oledid.SyntaxImprovement.*.nupkg" -Source "https://api.nuget.org/v3/index.json" -ApiKey ${{ secrets.NUGET_API_KEY }}
+      - name: Push to NuGet
+        if: matrix.branch == 'master'
+        run: dotnet nuget push src/SyntaxImprovement/bin/Release/oledid.SyntaxImprovement.*.nupkg --source "https://api.nuget.org/v3/index.json" --api-key ${{ secrets.NUGET_API_KEY }}
 
-    - name: Create release
-      run: 'curl --silent -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" -H "Content-Type: application/x-www-form-urlencoded" -d "@release-request.json" -X POST "https://api.github.com/repos/oledid/oledid.SyntaxImprovement/releases" > curl-result.txt'
-
-  build-dev:
-    runs-on: ubuntu-latest
-    if: github.ref == 'refs/heads/dev'
-
-    steps:
-    - uses: actions/checkout@v3
-      with:
-        fetch-depth: 0
-
-    - name: Set Git to checkout with CRLF
-      run: git config --global core.autocrlf true
-
-    - name: Install required tools
-      run: |
-        sudo apt-get update
-        sudo apt-get install -y curl wget apt-transport-https software-properties-common sqlite3 libsqlite3-dev
-        wget -q "https://packages.microsoft.com/config/ubuntu/22.04/packages-microsoft-prod.deb"
-        sudo dpkg -i packages-microsoft-prod.deb
-        sudo apt-get update
-        sudo apt-get install -y powershell
-
-    - name: Prepare version
-      run: pwsh prepare-version.ps1 -commitish ${{ github.sha }}
-
-    - name: Setup .NET Core
-      uses: actions/setup-dotnet@v4
-      with:
-        dotnet-version: 9.x.x
-
-    - name: Build with dotnet
-      run: dotnet build --configuration Release
-
-    - name: Test with dotnet
-      run: dotnet test ./src/SyntaxImprovement.Tests/SyntaxImprovement.Tests.csproj --no-restore --framework net9.0 --verbosity detailed
-
+      - name: Create release
+        if: matrix.branch == 'master'
+        run: |
+          curl --silent \
+            -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \
+            -H "Content-Type: application/x-www-form-urlencoded" \
+            -d "@release-request.json" \
+            -X POST "https://api.github.com/repos/oledid/oledid.SyntaxImprovement/releases" \
+            > curl-result.txt

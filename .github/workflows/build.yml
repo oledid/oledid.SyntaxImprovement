@@ -10,10 +10,6 @@ jobs:
   build:
     runs-on: ubuntu-latest
 
-    strategy:
-      matrix:
-        branch: [master, dev]
-
     steps:
       - uses: actions/checkout@v3
         with:
@@ -55,11 +51,11 @@ jobs:
         run: pwsh -Command "ls *.symbols.nupkg -Recurse | Remove-Item -Verbose"
 
       - name: Push to NuGet
-        if: matrix.branch == 'master'
+        if: github.ref_name == 'master'
         run: dotnet nuget push src/SyntaxImprovement/bin/Release/oledid.SyntaxImprovement.*.nupkg --source "https://api.nuget.org/v3/index.json" --api-key ${{ secrets.NUGET_API_KEY }}
 
       - name: Create release
-        if: matrix.branch == 'master'
+        if: github.ref_name == 'master'
         run: |
           curl --silent \
             -H "Authorization: token ${{ secrets.GITHUB_TOKEN }}" \

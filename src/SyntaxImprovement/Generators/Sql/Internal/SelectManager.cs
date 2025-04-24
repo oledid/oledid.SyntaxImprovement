@@ -47,18 +47,7 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			var whereQueryPart = WhereGenerator.CreateQuery(parameterFactory, whereStatement);
 			var orderByQueryPart = OrderByGenerator.CreateQuery(orderByStatements);
 
-			if (databaseType == DatabaseType.SQLite)
-			{
-				var topPart = TopOrNull == null
-					? string.Empty
-					: " LIMIT " + TopOrNull.Value;
-				return
-					  "SELECT " + string.Join(", ", columns)
-					+ " FROM " + tableName
-					+ whereQueryPart
-					+ orderByQueryPart + topPart + ";";
-			}
-			else
+			if (databaseType == DatabaseType.MSSQL)
 			{
 				var topPart = TopOrNull == null
 					? string.Empty
@@ -68,6 +57,17 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 					+ " FROM " + tableName
 					+ whereQueryPart
 					+ orderByQueryPart + ";";
+			}
+			else
+			{
+				var topPart = TopOrNull == null
+					? string.Empty
+					: " LIMIT " + TopOrNull.Value;
+				return
+					  "SELECT " + string.Join(", ", columns)
+					+ " FROM " + tableName
+					+ whereQueryPart
+					+ orderByQueryPart + topPart + ";";
 			}
 		}
 

@@ -14,7 +14,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 		{
 			var list = new List<long> { 100, 200 };
 			var query = new Select<LongTestEntity>().Where(e => e.Id == list.First()).ToQuery();
-			Assert.Equal("WHERE [Id] IS NOT DISTINCT FROM $1;", query.QueryText.AfterFirst("WHERE", includeMatchStringInResult: true));
+			Assert.Equal("WHERE \"Id\" IS NOT DISTINCT FROM @p0;", query.QueryText.AfterFirst("WHERE", includeMatchStringInResult: true));
 			Assert.Single(query.EnumerateParameters());
 			Assert.Equal(100, (long)query.EnumerateParameters().First().Value);
 		}
@@ -24,7 +24,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 		{
 			var list = new List<long> { 200 };
 			var query = new Select<LongTestEntity>().Where(e => e.Id == list.Single()).ToQuery();
-			Assert.Equal("WHERE [Id] IS NOT DISTINCT FROM $1;", query.QueryText.AfterFirst("WHERE", includeMatchStringInResult: true));
+			Assert.Equal("WHERE \"Id\" IS NOT DISTINCT FROM @p0;", query.QueryText.AfterFirst("WHERE", includeMatchStringInResult: true));
 			Assert.Single(query.EnumerateParameters());
 			Assert.Equal(200, (long)query.EnumerateParameters().First().Value);
 		}

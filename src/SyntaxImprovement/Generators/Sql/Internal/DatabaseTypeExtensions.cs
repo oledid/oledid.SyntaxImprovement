@@ -24,8 +24,8 @@
 		{
 			return databaseType switch
 			{
-				DatabaseType.SQLite => "\"" + columnName + "\"",
-				_ => "[" + columnName + "]"
+				DatabaseType.MSSQL => "[" + columnName + "]",
+				_ => "\"" + columnName + "\""
 			};
 		}
 

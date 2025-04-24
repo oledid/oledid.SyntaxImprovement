@@ -1,30 +1,67 @@
-﻿using Dapper;
-using Microsoft.Data.Sqlite;
-using oledid.SyntaxImprovement.Generators.Sql;
-using oledid.SyntaxImprovement.Tests.Generators.Sqlite.TestModels;
-using System;
-using System.Linq;
+﻿using System;
+using System.Data.Common;
+using System.Data;
+using System.Threading;
 using System.Threading.Tasks;
 using Xunit;
+using Xunit.Abstractions;
+using Testcontainers.PostgreSql;
+using Testcontainers.Xunit;
+using JetBrains.Annotations;
+using Npgsql;
+using oledid.SyntaxImprovement.Generators.Sql;
+using System.Linq;
+using oledid.SyntaxImprovement.Tests.Generators.PostgreSQL.TestModels;
+using Dapper;
 
-// must not be run in parallel because of the DapperTypeHandlerRegistration.Register()
-
-namespace oledid.SyntaxImprovement.Tests.Generators.SQLite
+namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 {
-	// todo: for null checks should be changed to: a = b OR (a IS NULL AND b IS NULL)
-
-	[CollectionDefinition(nameof(SqliteNonParallelTests), DisableParallelization = true)]
-	public class SqliteNonParallelTests { }
-
-	[Collection(nameof(SqliteNonParallelTests))]
-	public class SqliteIntegrationTests
+	public sealed class PostgreSqlContainerTest : IAsyncLifetime
 	{
+		private readonly PostgreSqlContainer _postgreSqlContainer = new PostgreSqlBuilder().Build();
+
+		public Task InitializeAsync()
+		{
+			return _postgreSqlContainer.StartAsync();
+		}
+
+		public Task DisposeAsync()
+		{
+			return _postgreSqlContainer.DisposeAsync().AsTask();
+		}
+
+		[Fact]
+		public void ConnectionStateReturnsOpen()
+		{
+			// Given
+			using DbConnection connection = new NpgsqlConnection(_postgreSqlContainer.GetConnectionString());
+
+			// When
+			connection.Open();
+
+			// Then
+			Assert.Equal(ConnectionState.Open, connection.State);
+		}
+
+		[Fact]
+		public async Task ExecScriptReturnsSuccessful()
+		{
+			// Given
+			const string scriptContent = "SELECT 1;";
+
+			// When
+			var execResult = await _postgreSqlContainer.ExecScriptAsync(scriptContent)
+				.ConfigureAwait(true);
+
+			// Then
+			Assert.True(0L.Equals(execResult.ExitCode), execResult.Stderr);
+			Assert.Empty(execResult.Stderr);
+		}
+
 		[Fact]
 		public async Task Integration_test_DataTypes()
 		{
-			DapperTypeHandlerRegistration.Register();
-
-			await using var connection = new SqliteConnection("Data Source=:memory:");
+			await using DbConnection connection = new NpgsqlConnection(_postgreSqlContainer.GetConnectionString());
 			await connection.OpenAsync();
 
 			var expected = new DataTypesModel
@@ -38,16 +75,21 @@ namespace oledid.SyntaxImprovement.Tests.Generators.SQLite
 				NullString = null
 			};
 
-			await connection.ExecuteAsync(@$"
-				CREATE TABLE IF NOT EXISTS ""{expected.GetSchemaName()}_{expected.GetTableName()}"" (
-					Boolean INTEGER NOT NULL,
-					Long INTEGER NOT NULL,
-					Decimal NUMERIC NOT NULL,
-					DateTime TEXT NOT NULL,
-					Guid TEXT NOT NULL,
-					StringWithValue TEXT NOT NULL,
-					NullString TEXT
-				);");
+			expected.DateTime = expected.DateTime.RemoveTimeParts(removeMilliseconds: true);
+
+			var createQuery = @$"
+				CREATE SCHEMA IF NOT EXISTS ""{expected.GetSchemaName()}"";
+
+				CREATE TABLE IF NOT EXISTS ""{expected.GetSchemaName()}"".""{expected.GetTableName()}"" (
+					""Boolean"" BOOLEAN NOT NULL,
+					""Long"" BIGINT NOT NULL,
+					""Decimal"" NUMERIC NOT NULL,
+					""DateTime"" TIMESTAMP NOT NULL,
+					""Guid"" UUID NOT NULL,
+					""StringWithValue"" TEXT NOT NULL,
+					""NullString"" TEXT
+				);";
+			await connection.ExecuteAsync(createQuery);
 
 			var insert = new Insert<DataTypesModel>().Add(expected).ToQuery();
 			await connection.ExecuteAsync(insert.QueryText, insert.Parameters);
@@ -61,9 +103,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.SQLite
 		[Fact]
 		public async Task Integration_test_Person()
 		{
-			DapperTypeHandlerRegistration.Register();
-
-			await using var connection = new SqliteConnection("Data Source=:memory:");
+			using DbConnection connection = new NpgsqlConnection(_postgreSqlContainer.GetConnectionString());
 			await connection.OpenAsync();
 
 			var def = new Person
@@ -72,8 +112,8 @@ namespace oledid.SyntaxImprovement.Tests.Generators.SQLite
 
 			await connection.ExecuteAsync(@$"
 				CREATE TABLE IF NOT EXISTS ""{def.GetTableName()}"" (
-					Id INTEGER PRIMARY KEY AUTOINCREMENT,
-					Name TEXT NOT NULL
+					""Id"" INTEGER GENERATED ALWAYS AS IDENTITY PRIMARY KEY,
+					""Name"" TEXT NOT NULL
 				);");
 
 			var peter = new Person
@@ -141,6 +181,47 @@ namespace oledid.SyntaxImprovement.Tests.Generators.SQLite
 			Assert.Equal(2, refetchAll.Count);
 			Assert.Equal("Peter", refetchAllDesc[0].Name);
 			Assert.Equal("Alan", refetchAllDesc[1].Name);
+		}
+
+		public sealed class ReuseContainerTest : IClassFixture<PostgreSqlFixture>, IDisposable
+		{
+			private readonly CancellationTokenSource _cts = new CancellationTokenSource(TimeSpan.FromMinutes(1));
+
+			private readonly PostgreSqlFixture _fixture;
+
+			public ReuseContainerTest(PostgreSqlFixture fixture)
+			{
+				_fixture = fixture;
+			}
+
+			public void Dispose()
+			{
+				_cts.Dispose();
+			}
+
+			[Theory]
+			[InlineData(0)]
+			[InlineData(1)]
+			[InlineData(2)]
+			public async Task StopsAndStartsContainerSuccessful(int _)
+			{
+				await _fixture.Container.StopAsync(_cts.Token)
+					.ConfigureAwait(true);
+
+				await _fixture.Container.StartAsync(_cts.Token)
+					.ConfigureAwait(true);
+
+				Assert.False(_cts.IsCancellationRequested);
+			}
+		}
+
+		[UsedImplicitly]
+		public sealed class PostgreSqlFixture : ContainerFixture<PostgreSqlBuilder, PostgreSqlContainer>
+		{
+			public PostgreSqlFixture(IMessageSink messageSink)
+				: base(messageSink)
+			{
+			}
 		}
 	}
 }

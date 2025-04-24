@@ -32,10 +32,10 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			else
 			{
 				var schemaValue = schemaName.HasValue()
-					? "[" + schemaName + "]."
+					? databaseType.GetColumnName(schemaName) + "."
 					: string.Empty;
 
-				return schemaValue + "[" + tableName + "]";
+				return schemaValue + databaseType.GetColumnName(tableName);
 			}
 		}
 

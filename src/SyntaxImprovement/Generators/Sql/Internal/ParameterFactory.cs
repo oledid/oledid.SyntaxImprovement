@@ -18,11 +18,6 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 			this.databaseType = databaseType;
 			currentParameterIterator = 0;
 			parameters = new List<Parameter>();
-
-			if (databaseType == DatabaseType.PostgreSQL)
-			{
-				currentParameterIterator = 1; // PostgreSQL starts with $1, $2, etc.
-			}
 		}
 
 		public string Create(object value)
@@ -43,7 +38,6 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 		{
 			return databaseType switch
 			{
-				DatabaseType.PostgreSQL => "$",
 				DatabaseType.SQLite => ":p",
 				_ => "@p",
 			};

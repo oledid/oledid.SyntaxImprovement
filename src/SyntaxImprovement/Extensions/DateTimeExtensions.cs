@@ -50,7 +50,7 @@ namespace oledid.SyntaxImprovement
 		[Pure]
 		public static DateTime RemoveTimeParts(this DateTime value, bool removeHours = false, bool removeMinutes = false, bool removeSeconds = false, bool removeMilliseconds = false)
 		{
-			var newValue = new DateTime(value.Ticks);
+			var newValue = value.TrimToMilliseconds();
 
 			if (removeHours)
 			{
@@ -73,6 +73,16 @@ namespace oledid.SyntaxImprovement
 			}
 
 			return newValue;
+		}
+
+		/// <summary>
+		/// Remove everything smaller than a millisecond (i.e. keep only whole milliseconds)
+		/// </summary>
+		[Pure]
+		public static DateTime TrimToMilliseconds(this DateTime value)
+		{
+			long ticks = value.Ticks - (value.Ticks % TimeSpan.TicksPerMillisecond);
+			return new DateTime(ticks, value.Kind);
 		}
 
 		/// <summary>

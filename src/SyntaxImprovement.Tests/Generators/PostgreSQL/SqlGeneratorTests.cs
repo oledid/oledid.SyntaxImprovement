@@ -15,35 +15,35 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 			public void It_generates_correct_select()
 			{
 				var query = new Select<Person>().ToQuery();
-				Assert.Equal("SELECT [Id], [Name] FROM [Person];", query.QueryText);
+				Assert.Equal("SELECT \"Id\", \"Name\" FROM \"Person\";", query.QueryText);
 			}
 
 			[Fact]
 			public void It_generates_correct_select_with_schema()
 			{
 				var query = new Select<PersonWithSchema>().ToQuery();
-				Assert.Equal("SELECT [Id], [Name] FROM [MySchema].[Person];", query.QueryText);
+				Assert.Equal("SELECT \"Id\", \"Name\" FROM \"MySchema\".\"Person\";", query.QueryText);
 			}
 
 			[Fact]
 			public void It_generates_correct_sql_with_computed_field()
 			{
 				var query = new Select<PersonWithComputedField>().ToQuery();
-				Assert.Equal("SELECT [Id], [Name], [CreatedUtc] FROM [Person];", query.QueryText);
+				Assert.Equal("SELECT \"Id\", \"Name\", \"CreatedUtc\" FROM \"Person\";", query.QueryText);
 			}
 
 			[Fact]
 			public void It_can_select_top_1()
 			{
 				var query = new Select<Person>(top: 1).ToQuery();
-				Assert.Equal("SELECT TOP 1 [Id], [Name] FROM [Person];", query.QueryText);
+				Assert.Equal("SELECT \"Id\", \"Name\" FROM \"Person\" LIMIT 1;", query.QueryText);
 			}
 
 			[Fact]
 			public void It_can_select_top_1337()
 			{
 				var query = new Select<Person>(top: 1337).ToQuery();
-				Assert.Equal("SELECT TOP 1337 [Id], [Name] FROM [Person];", query.QueryText);
+				Assert.Equal("SELECT \"Id\", \"Name\" FROM \"Person\" LIMIT 1337;", query.QueryText);
 			}
 
 			[Fact]
@@ -54,8 +54,8 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 					.Where(person => person.Name == "Peter")
 					.ToQuery();
 
-					Assert.Equal("SELECT [Id], [Name] FROM [Person] WHERE [Name] IS NOT DISTINCT FROM $1;", query.QueryText);
-					Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
+					Assert.Equal("SELECT \"Id\", \"Name\" FROM \"Person\" WHERE \"Name\" IS NOT DISTINCT FROM @p0;", query.QueryText);
+					Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
 				}
 
 				{
@@ -63,8 +63,8 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 					.Where(person => person.Name != "Peter")
 					.ToQuery();
 
-					Assert.Equal("SELECT [Id], [Name] FROM [Person] WHERE [Name] IS DISTINCT FROM $1;", query.QueryText);
-					Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
+					Assert.Equal("SELECT \"Id\", \"Name\" FROM \"Person\" WHERE \"Name\" IS DISTINCT FROM @p0;", query.QueryText);
+					Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
 				}
 			}
 
@@ -75,9 +75,9 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 					.Where(person => person.Name == "Peter" && person.Id == 1)
 					.ToQuery();
 
-				Assert.Equal("SELECT [Id], [Name] FROM [Person] WHERE ([Name] IS NOT DISTINCT FROM $1) AND ([Id] IS NOT DISTINCT FROM $2);", query.QueryText);
-				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
+				Assert.Equal("SELECT \"Id\", \"Name\" FROM \"Person\" WHERE (\"Name\" IS NOT DISTINCT FROM @p0) AND (\"Id\" IS NOT DISTINCT FROM @p1);", query.QueryText);
+				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
 			}
 
 			[Fact]
@@ -87,7 +87,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 					.OrderBy(person => person.Id)
 					.ToQuery();
 
-				Assert.Equal("SELECT [Id], [Name] FROM [Person] ORDER BY [Id];", query.QueryText);
+				Assert.Equal("SELECT \"Id\", \"Name\" FROM \"Person\" ORDER BY \"Id\";", query.QueryText);
 			}
 
 			[Fact]
@@ -97,7 +97,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 					.OrderBy(person => person.Id, descending: true)
 					.ToQuery();
 
-				Assert.Equal("SELECT [Id], [Name] FROM [Person] ORDER BY [Id] desc;", query.QueryText);
+				Assert.Equal("SELECT \"Id\", \"Name\" FROM \"Person\" ORDER BY \"Id\" desc;", query.QueryText);
 			}
 
 			[Fact]
@@ -108,7 +108,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 					.ThenBy(person => person.Name)
 					.ToQuery();
 
-				Assert.Equal("SELECT [Id], [Name] FROM [Person] ORDER BY [Id] desc, [Name];", query.QueryText);
+				Assert.Equal("SELECT \"Id\", \"Name\" FROM \"Person\" ORDER BY \"Id\" desc, \"Name\";", query.QueryText);
 			}
 
 			[Fact]
@@ -122,10 +122,10 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 					.ThenBy(person => person.Name)
 					.ToQuery();
 
-				Assert.Equal("SELECT [Id], [Name] FROM [Person] WHERE [Id] IN ($1, $2, $3) ORDER BY [Id] desc, [Name];", query.QueryText);
-				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-				Assert.Equal(3, ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
-				Assert.Equal(5, ((IDictionary<string, object>)((dynamic)query).Parameters)["$3"]);
+				Assert.Equal("SELECT \"Id\", \"Name\" FROM \"Person\" WHERE \"Id\" IN (@p0, @p1, @p2) ORDER BY \"Id\" desc, \"Name\";", query.QueryText);
+				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+				Assert.Equal(3, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
+				Assert.Equal(5, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p2"]);
 			}
 
 			[Fact]
@@ -135,8 +135,8 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 					.Where(person => person.Name.Contains("Pete"))
 					.ToQuery();
 
-				Assert.Equal("SELECT [Id], [Name] FROM [Person] WHERE [Name] LIKE $1;", query.QueryText);
-				Assert.Equal("%Pete%", ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
+				Assert.Equal("SELECT \"Id\", \"Name\" FROM \"Person\" WHERE \"Name\" LIKE @p0;", query.QueryText);
+				Assert.Equal("%Pete%", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
 			}
 
 			[Fact]
@@ -145,41 +145,41 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 				{
 					var idString = "DeviceId";
 					var query = new Select<BooleanTestModel>().Where(model => model.IdStr == idString && model.IsActive == true).ToQuery();
-					Assert.Equal("SELECT [IdStr], [IsActive] FROM [BooleanTestModel] WHERE ([IdStr] IS NOT DISTINCT FROM $1) AND ([IsActive] IS NOT DISTINCT FROM $2);", query.QueryText);
-					Assert.Equal(idString, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-					Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
+					Assert.Equal("SELECT \"IdStr\", \"IsActive\" FROM \"BooleanTestModel\" WHERE (\"IdStr\" IS NOT DISTINCT FROM @p0) AND (\"IsActive\" IS NOT DISTINCT FROM @p1);", query.QueryText);
+					Assert.Equal(idString, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+					Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
 				}
 
 				{
 					long? id = 28;
 					var query = new Select<LongTestEntity>().Where(model => model.Id == id && model.IsDeleted == false).ToQuery();
-					Assert.Equal("SELECT [Id], [IsDeleted] FROM [LongTest] WHERE ([Id] IS NOT DISTINCT FROM $1) AND ([IsDeleted] IS NOT DISTINCT FROM $2);", query.QueryText);
-					Assert.Equal(id, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-					Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
+					Assert.Equal("SELECT \"Id\", \"IsDeleted\" FROM \"LongTest\" WHERE (\"Id\" IS NOT DISTINCT FROM @p0) AND (\"IsDeleted\" IS NOT DISTINCT FROM @p1);", query.QueryText);
+					Assert.Equal(id, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+					Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
 				}
 
 				{
 					long? id = 28;
 					var query = new Select<LongTestEntity>().Where(model => model.Id == id.Value && model.IsDeleted == false).ToQuery();
-					Assert.Equal("SELECT [Id], [IsDeleted] FROM [LongTest] WHERE ([Id] IS NOT DISTINCT FROM $1) AND ([IsDeleted] IS NOT DISTINCT FROM $2);", query.QueryText);
-					Assert.Equal(id, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-					Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
+					Assert.Equal("SELECT \"Id\", \"IsDeleted\" FROM \"LongTest\" WHERE (\"Id\" IS NOT DISTINCT FROM @p0) AND (\"IsDeleted\" IS NOT DISTINCT FROM @p1);", query.QueryText);
+					Assert.Equal(id, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+					Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
 				}
 
 				{
 					Guid? id = Guid.NewGuid();
 					var query = new Select<GuidTestEntity>().Where(model => model.Fk == id && model.IsDeleted == false).ToQuery();
-					Assert.Equal("SELECT [Id], [Fk], [IsDeleted] FROM [GuidTestEntity] WHERE ([Fk] IS NOT DISTINCT FROM $1) AND ([IsDeleted] IS NOT DISTINCT FROM $2);", query.QueryText);
-					Assert.Equal(id, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-					Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
+					Assert.Equal("SELECT \"Id\", \"Fk\", \"IsDeleted\" FROM \"GuidTestEntity\" WHERE (\"Fk\" IS NOT DISTINCT FROM @p0) AND (\"IsDeleted\" IS NOT DISTINCT FROM @p1);", query.QueryText);
+					Assert.Equal(id, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+					Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
 				}
 
 				{
 					Guid? id = Guid.NewGuid();
 					var query = new Select<GuidTestEntity>().Where(model => model.Fk == id.Value && model.IsDeleted == false).ToQuery();
-					Assert.Equal("SELECT [Id], [Fk], [IsDeleted] FROM [GuidTestEntity] WHERE ([Fk] IS NOT DISTINCT FROM $1) AND ([IsDeleted] IS NOT DISTINCT FROM $2);", query.QueryText);
-					Assert.Equal(id, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-					Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
+					Assert.Equal("SELECT \"Id\", \"Fk\", \"IsDeleted\" FROM \"GuidTestEntity\" WHERE (\"Fk\" IS NOT DISTINCT FROM @p0) AND (\"IsDeleted\" IS NOT DISTINCT FROM @p1);", query.QueryText);
+					Assert.Equal(id, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+					Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
 				}
 			}
 
@@ -189,9 +189,9 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 				{
 					long id = 0;
 					var query = new Select<LongTestEntity>().Where(model => model.Id == id && model.IsDeleted == !false).ToQuery();
-					Assert.Equal("SELECT [Id], [IsDeleted] FROM [LongTest] WHERE ([Id] IS NOT DISTINCT FROM $1) AND ([IsDeleted] IS NOT DISTINCT FROM $2);", query.QueryText);
-					Assert.Equal(id, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-					Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
+					Assert.Equal("SELECT \"Id\", \"IsDeleted\" FROM \"LongTest\" WHERE (\"Id\" IS NOT DISTINCT FROM @p0) AND (\"IsDeleted\" IS NOT DISTINCT FROM @p1);", query.QueryText);
+					Assert.Equal(id, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+					Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
 				}
 			}
 
@@ -199,10 +199,10 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 			public void It_understands_gt_and_lt()
 			{
 				var query = new Select<LongTestEntity>().Where(model => model.Id > 1000 && model.IsDeleted == !true && model.Id <= 1001L).ToQuery();
-				Assert.Equal("SELECT [Id], [IsDeleted] FROM [LongTest] WHERE (([Id] > $1) AND ([IsDeleted] IS NOT DISTINCT FROM $2)) AND ([Id] <= $3);", query.QueryText);
-				Assert.Equal(1000L, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-				Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
-				Assert.Equal(1001L, ((IDictionary<string, object>)((dynamic)query).Parameters)["$3"]);
+				Assert.Equal("SELECT \"Id\", \"IsDeleted\" FROM \"LongTest\" WHERE ((\"Id\" > @p0) AND (\"IsDeleted\" IS NOT DISTINCT FROM @p1)) AND (\"Id\" <= @p2);", query.QueryText);
+				Assert.Equal(1000L, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+				Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
+				Assert.Equal(1001L, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p2"]);
 			}
 
 			[Fact]
@@ -211,8 +211,8 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 				var query = new Select<BooleanTestModel>()
 					.Where(e => e.IsActive)
 					.ToQuery();
-				Assert.Equal("SELECT [IdStr], [IsActive] FROM [BooleanTestModel] WHERE [IsActive] IS NOT DISTINCT FROM $1;", query.QueryText);
-				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
+				Assert.Equal("SELECT \"IdStr\", \"IsActive\" FROM \"BooleanTestModel\" WHERE \"IsActive\" IS NOT DISTINCT FROM @p0;", query.QueryText);
+				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
 			}
 
 			[Fact]
@@ -221,8 +221,8 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 				var query = new Select<BooleanTestModel>()
 					.Where(e => e.IsActive == false)
 					.ToQuery();
-				Assert.Equal("SELECT [IdStr], [IsActive] FROM [BooleanTestModel] WHERE [IsActive] IS NOT DISTINCT FROM $1;", query.QueryText);
-				Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
+				Assert.Equal("SELECT \"IdStr\", \"IsActive\" FROM \"BooleanTestModel\" WHERE \"IsActive\" IS NOT DISTINCT FROM @p0;", query.QueryText);
+				Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
 			}
 
 			[Fact]
@@ -231,21 +231,21 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 				var query = new Select<BooleanTestModel>()
 					.Where(e => !e.IsActive)
 					.ToQuery();
-				Assert.Equal("SELECT [IdStr], [IsActive] FROM [BooleanTestModel] WHERE [IsActive] IS NOT DISTINCT FROM $1;", query.QueryText);
-				Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
+				Assert.Equal("SELECT \"IdStr\", \"IsActive\" FROM \"BooleanTestModel\" WHERE \"IsActive\" IS NOT DISTINCT FROM @p0;", query.QueryText);
+				Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
 			}
 
 			[Fact]
 			public void It_understands_include_fields()
 			{
 				var query1 = new Select<BooleanTestModel>(includeFields: new IncludeFields<BooleanTestModel>(e => e.IdStr)).ToQuery();
-				Assert.Equal("SELECT [IdStr] FROM [BooleanTestModel];", query1.QueryText);
+				Assert.Equal("SELECT \"IdStr\" FROM \"BooleanTestModel\";", query1.QueryText);
 
 				var query2 = new Select<BooleanTestModel>(includeFields: new IncludeFields<BooleanTestModel>(e => e.IsActive)).ToQuery();
-				Assert.Equal("SELECT [IsActive] FROM [BooleanTestModel];", query2.QueryText);
+				Assert.Equal("SELECT \"IsActive\" FROM \"BooleanTestModel\";", query2.QueryText);
 
 				var query3 = new Select<BooleanTestModel>(includeFields: new IncludeFields<BooleanTestModel>(e => e.IdStr, e => e.IsActive)).ToQuery();
-				Assert.Equal("SELECT [IdStr], [IsActive] FROM [BooleanTestModel];", query3.QueryText);
+				Assert.Equal("SELECT \"IdStr\", \"IsActive\" FROM \"BooleanTestModel\";", query3.QueryText);
 			}
 		}
 
@@ -259,9 +259,9 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 					.Where(person => person.Id == 1)
 					.ToQuery();
 
-				Assert.Equal("UPDATE [Person] SET [Name] = $2 WHERE [Id] IS NOT DISTINCT FROM $1", query.QueryText);
-				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
-				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
+				Assert.Equal("UPDATE \"Person\" SET \"Name\" = @p1 WHERE \"Id\" IS NOT DISTINCT FROM @p0", query.QueryText);
+				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
+				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
 			}
 
 			[Fact]
@@ -274,12 +274,12 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 					.Where(person => names.Contains(person.Name) && person.Id == 1)
 					.ToQuery();
 
-				Assert.Equal("UPDATE [Person] SET [Name] = $5 WHERE ([Name] IN ($1, $2, $3)) AND ([Id] IS NOT DISTINCT FROM $4)", query.QueryText);
-				Assert.Equal("Per", ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-				Assert.Equal("Pål", ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
-				Assert.Equal("Espen", ((IDictionary<string, object>)((dynamic)query).Parameters)["$3"]);
-				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["$4"]);
-				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["$5"]);
+				Assert.Equal("UPDATE \"Person\" SET \"Name\" = @p4 WHERE (\"Name\" IN (@p0, @p1, @p2)) AND (\"Id\" IS NOT DISTINCT FROM @p3)", query.QueryText);
+				Assert.Equal("Per", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+				Assert.Equal("Pål", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
+				Assert.Equal("Espen", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p2"]);
+				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p3"]);
+				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p4"]);
 			}
 
 			[Fact]
@@ -304,10 +304,10 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 					.Where(person => person.Id == 1)
 					.ToQuery();
 
-				Assert.Equal("UPDATE [Person] SET [Name] = $2, [Id] = $3 WHERE [Id] IS NOT DISTINCT FROM $1", query.QueryText);
-				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
-				Assert.Equal(2, ((IDictionary<string, object>)((dynamic)query).Parameters)["$3"]);
-				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
+				Assert.Equal("UPDATE \"Person\" SET \"Name\" = @p1, \"Id\" = @p2 WHERE \"Id\" IS NOT DISTINCT FROM @p0", query.QueryText);
+				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
+				Assert.Equal(2, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p2"]);
+				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
 			}
 
 			class It_can_update_entire_model_Class : DatabaseTable
@@ -360,14 +360,14 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 					.Where(e => e.Id == original.Id)
 					.ToQuery();
 
-				Assert.Equal("UPDATE [Table] SET [Id] = $2, [FirstName] = $3, [IsAdmin] = $5, [LastName] = $6 WHERE [Id] IS NOT DISTINCT FROM $1", query.QueryText);
-				Assert.Equal(2, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-				Assert.Equal(5, ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
-				Assert.Equal("Ole M", ((IDictionary<string, object>)((dynamic)query).Parameters)["$3"]);
-				Assert.Equal("Did", ((IDictionary<string, object>)((dynamic)query).Parameters)["$4"]);
-				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["$5"]);
-				Assert.Equal("Diddy", ((IDictionary<string, object>)((dynamic)query).Parameters)["$6"]);
-				Assert.Throws<KeyNotFoundException>(() => ((IDictionary<string, object>)((dynamic)query).Parameters)["$7"]);
+				Assert.Equal("UPDATE \"Table\" SET \"Id\" = @p1, \"FirstName\" = @p2, \"IsAdmin\" = @p4, \"LastName\" = @p5 WHERE \"Id\" IS NOT DISTINCT FROM @p0", query.QueryText);
+				Assert.Equal(2, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+				Assert.Equal(5, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
+				Assert.Equal("Ole M", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p2"]);
+				Assert.Equal("Did", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p3"]);
+				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p4"]);
+				Assert.Equal("Diddy", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p5"]);
+				Assert.Throws<KeyNotFoundException>(() => ((IDictionary<string, object>)((dynamic)query).Parameters)["@p6"]);
 			}
 
 			[Fact]
@@ -397,12 +397,12 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 					.Where(u => u.Id == user.Id)
 					.ToQuery();
 
-				Assert.Equal("UPDATE [userschema].[User] SET [PersonId] = $2, [IsActive] = $3, [IsAdmin] = $4, [CanWrite] = $5 WHERE [Id] IS NOT DISTINCT FROM $1", query.QueryText);
-				Assert.Equal(userId, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-				Assert.Equal(personId, ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
-				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["$3"]);
-				Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["$4"]);
-				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["$5"]);
+				Assert.Equal("UPDATE \"userschema\".\"User\" SET \"PersonId\" = @p1, \"IsActive\" = @p2, \"IsAdmin\" = @p3, \"CanWrite\" = @p4 WHERE \"Id\" IS NOT DISTINCT FROM @p0", query.QueryText);
+				Assert.Equal(userId, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+				Assert.Equal(personId, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
+				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p2"]);
+				Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p3"]);
+				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p4"]);
 			}
 		}
 
@@ -414,8 +414,8 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 				var person = new Person { Id = 1, Name = "Peter" };
 				var query = new Insert<Person>().Add(person).ToQuery();
 
-				Assert.Equal("INSERT INTO [Person] ([Name]) SELECT $1 RETURNING [Id];", query.QueryText);
-				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
+				Assert.Equal("INSERT INTO \"Person\" (\"Name\") SELECT @p0 RETURNING \"Id\";", query.QueryText);
+				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
 			}
 
 			[Fact]
@@ -428,9 +428,9 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 				};
 				var query = new Insert<Person>().Add(persons).ToQuery();
 
-				Assert.Equal("INSERT INTO [Person] ([Name]) SELECT $1; INSERT INTO [Person] ([Name]) SELECT $2; ", query.QueryText);
-				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-				Assert.Equal("Roger", ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
+				Assert.Equal("INSERT INTO \"Person\" (\"Name\") SELECT @p0; INSERT INTO \"Person\" (\"Name\") SELECT @p1; ", query.QueryText);
+				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+				Assert.Equal("Roger", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
 			}
 
 			[Fact]
@@ -440,9 +440,9 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 				var roger = new Person { Name = "Roger" };
 				var query = new Insert<Person>().Add(peter, roger).ToQuery();
 
-				Assert.Equal("INSERT INTO [Person] ([Name]) SELECT $1; INSERT INTO [Person] ([Name]) SELECT $2; ", query.QueryText);
-				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-				Assert.Equal("Roger", ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
+				Assert.Equal("INSERT INTO \"Person\" (\"Name\") SELECT @p0; INSERT INTO \"Person\" (\"Name\") SELECT @p1; ", query.QueryText);
+				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+				Assert.Equal("Roger", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
 			}
 
 			[Fact]
@@ -455,9 +455,9 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 					.Add(roger)
 					.ToQuery();
 
-				Assert.Equal("INSERT INTO [Person] ([Name]) SELECT $1; INSERT INTO [Person] ([Name]) SELECT $2; ", query.QueryText);
-				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-				Assert.Equal("Roger", ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
+				Assert.Equal("INSERT INTO \"Person\" (\"Name\") SELECT @p0; INSERT INTO \"Person\" (\"Name\") SELECT @p1; ", query.QueryText);
+				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+				Assert.Equal("Roger", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
 			}
 
 			[Fact]
@@ -475,14 +475,14 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 				};
 				var query = new Insert<DataTypesModel>().Add(model).ToQuery();
 
-				Assert.Equal("INSERT INTO [TestSchema].[DataTypesModel] ([Boolean], [Long], [Decimal], [DateTime], [Guid], [StringWithValue], [NullString]) SELECT $1, $2, $3, $4, $5, $6, $7;", query.QueryText.Trim());
-				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-				Assert.Equal(int.MaxValue + 1L, ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
-				Assert.Equal(0.42m, ((IDictionary<string, object>)((dynamic)query).Parameters)["$3"]);
-				Assert.Equal(new DateTime(2018, 2, 23, 13, 37, 0), ((IDictionary<string, object>)((dynamic)query).Parameters)["$4"]);
-				Assert.Equal(new Guid("67a76215-bc11-41cb-838f-c43fe81efcae"), ((IDictionary<string, object>)((dynamic)query).Parameters)["$5"]);
-				Assert.Equal("abc123", ((IDictionary<string, object>)((dynamic)query).Parameters)["$6"]);
-				Assert.Null(((IDictionary<string, object>)((dynamic)query).Parameters)["$7"]);
+				Assert.Equal("INSERT INTO \"TestSchema\".\"DataTypesModel\" (\"Boolean\", \"Long\", \"Decimal\", \"DateTime\", \"Guid\", \"StringWithValue\", \"NullString\") SELECT @p0, @p1, @p2, @p3, @p4, @p5, @p6;", query.QueryText.Trim());
+				Assert.Equal(true, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+				Assert.Equal(int.MaxValue + 1L, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
+				Assert.Equal(0.42m, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p2"]);
+				Assert.Equal(new DateTime(2018, 2, 23, 13, 37, 0), ((IDictionary<string, object>)((dynamic)query).Parameters)["@p3"]);
+				Assert.Equal(new Guid("67a76215-bc11-41cb-838f-c43fe81efcae"), ((IDictionary<string, object>)((dynamic)query).Parameters)["@p4"]);
+				Assert.Equal("abc123", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p5"]);
+				Assert.Null(((IDictionary<string, object>)((dynamic)query).Parameters)["@p6"]);
 			}
 		}
 
@@ -492,9 +492,9 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 			public void It_generates_correct_query()
 			{
 				var query = new Delete<Person>().Where(person => person.Name == "Peter" || person.Id == 1).ToQuery();
-				Assert.Equal("DELETE FROM [Person] WHERE ([Name] IS NOT DISTINCT FROM $1) OR ([Id] IS NOT DISTINCT FROM $2);", query.QueryText);
-				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
+				Assert.Equal("DELETE FROM \"Person\" WHERE (\"Name\" IS NOT DISTINCT FROM @p0) OR (\"Id\" IS NOT DISTINCT FROM @p1);", query.QueryText);
+				Assert.Equal("Peter", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
 			}
 		}
 
@@ -515,11 +515,11 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 
 				var query = select.ToQuery();
 
-				var expected = $"SELECT [Id], [FkId], [NullableDateTime], [NullableBool], [NullableStr] FROM [NullTest] WHERE ([FkId] IS NOT DISTINCT FROM $1) AND ((([NullableDateTime] IS NOT DISTINCT FROM NULL) OR (([NullableBool] IS NOT DISTINCT FROM $2) AND ([NullableStr] IS NOT DISTINCT FROM NULL))) OR ([NullableStr] IS NOT DISTINCT FROM $3));";
+				var expected = $"SELECT \"Id\", \"FkId\", \"NullableDateTime\", \"NullableBool\", \"NullableStr\" FROM \"NullTest\" WHERE (\"FkId\" IS NOT DISTINCT FROM @p0) AND (((\"NullableDateTime\" IS NOT DISTINCT FROM NULL) OR ((\"NullableBool\" IS NOT DISTINCT FROM @p1) AND (\"NullableStr\" IS NOT DISTINCT FROM NULL))) OR (\"NullableStr\" IS NOT DISTINCT FROM @p2));";
 				Assert.Equal(expected, query.QueryText);
-				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-				Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
-				Assert.Equal("123", ((IDictionary<string, object>)((dynamic)query).Parameters)["$3"]);
+				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+				Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
+				Assert.Equal("123", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p2"]);
 				Assert.Equal(3, query.EnumerateParameters().Count());
 			}
 
@@ -538,11 +538,11 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 
 				var query = select.ToQuery();
 
-				var expected = $"SELECT [Id], [FkId], [NullableDateTime], [NullableBool], [NullableStr] FROM [NullTest] WHERE ([FkId] IS NOT DISTINCT FROM $1) AND ((([NullableDateTime] IS DISTINCT FROM NULL) OR (([NullableBool] IS NOT DISTINCT FROM $2) AND ([NullableStr] IS NOT DISTINCT FROM NULL))) OR ([NullableStr] IS NOT DISTINCT FROM $3));";
+				var expected = $"SELECT \"Id\", \"FkId\", \"NullableDateTime\", \"NullableBool\", \"NullableStr\" FROM \"NullTest\" WHERE (\"FkId\" IS NOT DISTINCT FROM @p0) AND (((\"NullableDateTime\" IS DISTINCT FROM NULL) OR ((\"NullableBool\" IS NOT DISTINCT FROM @p1) AND (\"NullableStr\" IS NOT DISTINCT FROM NULL))) OR (\"NullableStr\" IS NOT DISTINCT FROM @p2));";
 				Assert.Equal(expected, query.QueryText);
-				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-				Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
-				Assert.Equal("123", ((IDictionary<string, object>)((dynamic)query).Parameters)["$3"]);
+				Assert.Equal(1, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+				Assert.Equal(false, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
+				Assert.Equal("123", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p2"]);
 				Assert.Equal(3, query.EnumerateParameters().Count());
 			}
 

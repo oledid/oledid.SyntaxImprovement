@@ -13,7 +13,7 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 			var query = new Select<ModelWithIgnoreField>()
 				.ToQuery();
 
-			Assert.Equal("SELECT [Id], [Name] FROM [ModelWithIgnoreField];", query.QueryText);
+			Assert.Equal("SELECT \"Id\", \"Name\" FROM \"ModelWithIgnoreField\";", query.QueryText);
 		}
 
 		[Fact]
@@ -30,9 +30,9 @@ namespace oledid.SyntaxImprovement.Tests.Generators.PostgreSQL
 				.Add(instance)
 				.ToQuery();
 
-			Assert.Equal("INSERT INTO [ModelWithIgnoreField] ([Name]) SELECT $1 RETURNING [Id];", query.QueryText.Trim());
-			Assert.Equal("a", ((IDictionary<string, object>)((dynamic)query).Parameters)["$1"]);
-			Assert.Throws<KeyNotFoundException>(() => ((IDictionary<string, object>)((dynamic)query).Parameters)["$2"]);
+			Assert.Equal("INSERT INTO \"ModelWithIgnoreField\" (\"Name\") SELECT @p0 RETURNING \"Id\";", query.QueryText.Trim());
+			Assert.Equal("a", ((IDictionary<string, object>)((dynamic)query).Parameters)["@p0"]);
+			Assert.Throws<KeyNotFoundException>(() => ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
 		}
 	}
 }

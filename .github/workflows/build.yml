@@ -29,7 +29,7 @@ jobs:
       run: dotnet build --configuration Release
 
     - name: Test with dotnet
-      run: dotnet test ./src/SyntaxImprovement.Tests/SyntaxImprovement.Tests.csproj --no-build --framework net9.0 --verbosity normal
+      run: dotnet test ./src/SyntaxImprovement.Tests/SyntaxImprovement.Tests.csproj --no-restore --framework net9.0 --verbosity normal
 
     - name: Pack
       run: pwsh pack.ps1
@@ -74,5 +74,5 @@ jobs:
       run: dotnet build --configuration Release
 
     - name: Test with dotnet
-      run: dotnet test ./src/SyntaxImprovement.Tests/SyntaxImprovement.Tests.csproj --no-build --framework net9.0 --verbosity normal
+      run: dotnet test ./src/SyntaxImprovement.Tests/SyntaxImprovement.Tests.csproj --no-restore --framework net9.0 --verbosity normal
 

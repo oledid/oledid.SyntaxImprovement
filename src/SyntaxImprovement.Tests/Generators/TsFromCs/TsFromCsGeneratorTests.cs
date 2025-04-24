@@ -42,7 +42,7 @@ export interface ITypesEntity {
 }
 ";
 			var actual = TsFromCsGenerator.GenerateTypescriptInterfaceFromCsharpClass(typeof(TypesEntity), typeof(PersonEntity), typeof(IgnoredClass), typeof(A));
-			Assert.Equal(expected, actual);
+			Assert.Equal(expected.Replace("\r", ""), actual.Replace("\r", ""));
 
 			Assert.Equal(
 				expected: @"error error // multiple classes with the same name: ""PersonEntity"", please correct by renaming a class or adding a TsFromCsNameAttribute",

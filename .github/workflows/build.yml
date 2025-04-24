@@ -39,16 +39,16 @@ jobs:
         run: dotnet build --configuration Release
 
       - name: Test with dotnet
-        run: dotnet test ./src/SyntaxImprovement.Tests/SyntaxImprovement.Tests.csproj --no-restore --framework net9.0 --verbosity detailed
+        run: dotnet test ./src/SyntaxImprovement.Tests/SyntaxImprovement.Tests.csproj --no-restore --framework net9.0 --verbosity normal
 
       - name: Pack
         run: pwsh pack.ps1
 
       - name: List all *.nupkg
-        run: pwsh -Command "ls *.nupkg -Recurse"
+        run: pwsh -Command "Get-ChildItem *.nupkg -Recurse"
 
       - name: Delete all *.symbols.nupkg
-        run: pwsh -Command "ls *.symbols.nupkg -Recurse | Remove-Item -Verbose"
+        run: pwsh -Command "Get-ChildItem *.symbols.nupkg -Recurse | Remove-Item -Verbose"
 
       - name: Push to NuGet
         if: github.ref_name == 'master'

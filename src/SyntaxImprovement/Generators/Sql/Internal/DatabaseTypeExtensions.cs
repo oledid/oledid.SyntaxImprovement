@@ -7,7 +7,8 @@
 			return databaseType switch
 			{
 				DatabaseType.SQLite => " IS ",
-				_ => " IS NOT DISTINCT FROM "
+				DatabaseType.MSSQL => " IS NOT DISTINCT FROM ",
+				_ => " = "
 			};
 		}
 
@@ -16,7 +17,8 @@
 			return databaseType switch
 			{
 				DatabaseType.SQLite => " IS NOT ",
-				_ => " IS DISTINCT FROM "
+				DatabaseType.MSSQL => " IS DISTINCT FROM ",
+				_ => " != "
 			};
 		}
 

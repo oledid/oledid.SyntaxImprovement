@@ -8,6 +8,7 @@
 			{
 				DatabaseType.SQLite => " IS ",
 				DatabaseType.MSSQL => " IS NOT DISTINCT FROM ",
+				DatabaseType.PostgreSQL => " IS NOT DISTINCT FROM ",
 				_ => " = "
 			};
 		}
@@ -18,6 +19,7 @@
 			{
 				DatabaseType.SQLite => " IS NOT ",
 				DatabaseType.MSSQL => " IS DISTINCT FROM ",
+				DatabaseType.PostgreSQL => " IS DISTINCT FROM ",
 				_ => " != "
 			};
 		}

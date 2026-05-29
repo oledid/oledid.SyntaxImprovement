@@ -265,6 +265,20 @@ namespace oledid.SyntaxImprovement.Tests.Generators.MsSql
 			}
 
 			[Fact]
+			public void It_treats_byte_array_as_a_single_scalar_parameter()
+			{
+				var data = new byte[] { 1, 2, 3, 4 };
+
+				var query = new Update<TestModels.BinaryModel>()
+					.Set(model => model.Data, data)
+					.Where(model => model.Id == 1)
+					.ToQuery();
+
+				Assert.Equal("UPDATE [BinaryModel] SET [Data] = @p1 WHERE [Id] IS NOT DISTINCT FROM @p0", query.QueryText);
+				Assert.Same(data, ((IDictionary<string, object>)((dynamic)query).Parameters)["@p1"]);
+			}
+
+			[Fact]
 			public void It_generates_correct_update_IN()
 			{
 				var names = new List<string> { "Per", "Pål", "Espen" };

@@ -22,7 +22,9 @@ namespace oledid.SyntaxImprovement.Generators.Sql.Internal
 
 		public string Create(object value)
 		{
-			if (value is ICollection values)
+			// byte[] is an ICollection but represents a single binary value (e.g. a bytea/varbinary column),
+			// so it must be passed as one scalar parameter rather than expanded into an IN-style list.
+			if (value is ICollection values && value is not byte[])
 				return CreateCollection(values);
 
 			var parameter = new Parameter
